@@ -1,0 +1,26 @@
+{
+  "VOS": {
+    
+    "teacher": {
+      "name": "",
+      "available": false,
+      "display": "",
+      "reply": "",
+      
+      "hours": {
+        "start": "12",
+        "end": "12"
+      },  
+      
+      "minutes": {
+        "start": "00",
+        "end": "00"
+      }
+    },
+    
+    "student": {
+      "name": "",
+      "message": ""
+    }
+  }
+}

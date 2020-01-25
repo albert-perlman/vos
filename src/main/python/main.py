@@ -9,7 +9,10 @@ from PyQt5.QtMultimedia  import *
 import os
 import sys
 
-from PyStyle import *
+from PyStyle import StyleSheet
+import FireThread
+
+em = 1
 
 class MainWindow(QMainWindow):
   resized = pyqtSignal()
@@ -31,12 +34,33 @@ class MainWindow(QMainWindow):
     self.maxScreenHeight = self.screenSize.height()
 
     # Main Window sizing
-    self.setMinimumSize(self.maxScreenWidth//2.5,self.maxScreenHeight//2.5)
-    self.resize(self.maxScreenWidth//2,self.maxScreenHeight//2)
+    self.setMinimumSize(1024*em,600*em)
+    self.resize(1024*em,600*em)
 
     #############
     #  WIDGETS  #
     #############
+
+   # self.startBtn.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Minimum)
+
+    # Available / Unavailable #
+    self.available = QLabel("UNAVAILABLE")
+    self.available.setFixedSize(250*em,50*em)
+    self.available.setAlignment(Qt.AlignCenter)
+    self.available.setStyleSheet(StyleSheet.css("unavailable"))
+
+    # Display Message #
+    self.displayMsg = QTextEdit()
+    self.displayMsg.setFixedSize(800*em, 90*em)
+    self.displayMsg.setText("No messages")
+    self.displayMsg.setReadOnly(True)
+    self.displayMsg.setAlignment(Qt.AlignCenter)
+    self.displayMsg.setStyleSheet(StyleSheet.css("displayMsg"))
+
+    # Refresh Button #
+    self.refreshBtn = QPushButton()
+    self.refreshBtn.setText("@")
+    self.refreshBtn.setStyleSheet(StyleSheet.css("button"))
 
     # status bar #
     self.status = QStatusBar()
@@ -47,16 +71,79 @@ class MainWindow(QMainWindow):
     #  LAYOUTS  #
     #############
 
+    # main vertical container layout
+    MainVLayout = QVBoxLayout(MainWidgetContainer)
+
+    # top info bar
+    TopHLayout = QHBoxLayout()
+    TopHLayout.setAlignment(Qt.AlignCenter)
+    TopHLayout.addWidget(self.available)
+
+    # display message
+    DisplayMsgHLayout = QHBoxLayout()
+    DisplayMsgHLayout.setAlignment(Qt.AlignCenter)
+    DisplayMsgHLayout.addWidget(self.displayMsg)
+
+    # bottom info bar
+    BottomHLayout = QHBoxLayout()
+    BottomHLayout.setAlignment(Qt.AlignRight)
+    BottomHLayout.addWidget(self.refreshBtn)
+
+    # add layouts and widgets
+    MainVLayout.addLayout(TopHLayout)
+    MainVLayout.addLayout(DisplayMsgHLayout)
+    MainVLayout.addLayout(BottomHLayout)
+
     ####################
     #  SIGNAL / SLOTS  #
     ####################
     self.resized.connect(self.SLOT_resized)
+    self.refreshBtn.clicked.connect(self.SLOT_refreshBtnClicked)
+    self.displayMsg.textChanged.connect(self.SLOT_displayMsgChanged)
 
     ####################
     #     START-UP     #
     ####################
     self.updateTitle()
     self.show()
+
+    timer = QTimer(self)
+    timer.timeout.connect(self.SLOT_refreshBtnClicked)
+    timer.start(2000)
+
+
+  # read data value for given tag stored in Firebase
+  def readFirebase(self):
+
+     # create Firebase data retrieval thread
+    self.FireThread = FireThread.FireThread()
+
+    # run Firebase thread
+    self.FireThread.start()
+    self.FireThread.setAvailable.connect(self.SLOT_availabilityChanged)
+    self.FireThread.setDisplayMsg.connect(self.displayMsg.setText)
+    self.FireThread.finished.connect(self.SLOT_threadFinished)
+
+
+  def SLOT_availabilityChanged(self, availability):
+    if( "true" == availability ):
+      self.available.setText("AVAILABLE")
+      self.available.setStyleSheet(StyleSheet.css("available"))
+    elif( "false" == availability ):
+      self.available.setText("UNAVAILABLE")
+      self.available.setStyleSheet(StyleSheet.css("unavailable"))
+
+  # SLOT: refresh button clicked - retrieve data from Firebase
+  def SLOT_refreshBtnClicked(self):
+    self.readFirebase()
+
+  # SLOT: thread finished
+  def SLOT_threadFinished(self):
+    pass
+
+  # SLOT: display Message changed
+  def SLOT_displayMsgChanged(self):
+    self.displayMsg.setAlignment(Qt.AlignCenter)
 
   # SLOT: Main Window has been resized
   def SLOT_resized(self):
@@ -78,7 +165,7 @@ class MainWindow(QMainWindow):
 
   # update main window title
   def updateTitle(self, str=""):
-    self.setWindowTitle(""+ str)
+    self.setWindowTitle("V\tO\tS"+ str)
 
   # map key press events to gallery navigation
   def keyPressEvent(self, event):
