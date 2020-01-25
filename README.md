@@ -1,2 +1,2 @@
-# PyQt GUI template
-template repository for PyQt projects using fbs build system
+# VOS - Virtual Office Secretary
+Missouri S&T ECE Department - Senior Design 2
