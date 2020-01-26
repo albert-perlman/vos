@@ -109,14 +109,14 @@ class MainWindow(QMainWindow):
 
     timer = QTimer(self)
     timer.timeout.connect(self.SLOT_refreshBtnClicked)
-    timer.start(2000)
+    timer.start(1750)
 
 
   # read data value for given tag stored in Firebase
   def readFirebase(self):
 
      # create Firebase data retrieval thread
-    self.FireThread = FireThread.FireThread()
+    self.FireThread = FireThread.FireThread( self.displayMsg.toPlainText() )
 
     # run Firebase thread
     self.FireThread.start()

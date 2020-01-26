@@ -1,26 +1,16 @@
 {
   "VOS": {
     
-    "teacher": {
-      "name": "",
-      "available": false,
-      "display": "",
-      "reply": "",
-      
-      "hours": {
-        "start": "12",
-        "end": "12"
-      },  
-      
-      "minutes": {
-        "start": "00",
-        "end": "00"
-      }
-    },
-    
-    "student": {
-      "name": "",
-      "message": ""
-    }
+    "t-name": "" ,
+    "t-available": false,
+    "t-display": "",
+    "t-reply": "",
+    "t-hours-start": "12",
+    "t-hours-end": "12",
+    "t-minutes-start": "00",
+    "t-minutes-end": "00",
+  
+    "s-name": "",
+    "s-msg": ""
   }
 }
