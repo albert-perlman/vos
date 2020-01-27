@@ -174,6 +174,7 @@ class MainWindow(QMainWindow):
 
     # connect signals
     self.FireThread.setAvailable.connect(self.SLOT_availabilityChanged)
+    self.FireThread.setTeacherName.connect(self.updateTitle)
     self.FireThread.setDisplayMsg.connect(self.displayMsg.setText)
     self.FireThread.finished.connect(self.SLOT_threadFinished)
 
@@ -202,6 +203,7 @@ class MainWindow(QMainWindow):
   def SLOT_sendMsgBtnClicked(self):
     pass
 
+  # SLOT: student message selection clicked
   def SLOT_studentMsgSelClicked(self):
     msg = self.sender().text()
     self.writeFirebase("s-msg", msg)
@@ -216,7 +218,10 @@ class MainWindow(QMainWindow):
 
   # SLOT: Display Message changed
   def SLOT_displayMsgChanged(self):
-    self.displayMsg.setAlignment(Qt.AlignCenter)
+    try:
+      self.displayMsg.setAlignment(Qt.AlignCenter)
+    except:
+      pass
 
   # SLOT: Main Window has been resized
   def SLOT_resized(self):
@@ -238,7 +243,7 @@ class MainWindow(QMainWindow):
 
   # update main window title
   def updateTitle(self, str=""):
-    self.setWindowTitle("V\tO\tS"+ str)
+    self.setWindowTitle(""+ str)
 
   # map key press events to gallery navigation
   def keyPressEvent(self, event):

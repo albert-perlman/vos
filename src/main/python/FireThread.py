@@ -8,6 +8,7 @@ class FireThread(QThread):
 
   # signals slotted to main thread
   finished = pyqtSignal(dict)
+  setTeacherName = pyqtSignal(str)
   setDisplayMsg = pyqtSignal(str)
   setAvailable = pyqtSignal(str)
 
@@ -55,9 +56,13 @@ class FireThread(QThread):
         dataVal = db.get( '/VOS/' + tag, None )
         self.newData[tag] = dataVal
 
+        # if the data has changed since last read
         if( dataVal != self.oldData[tag] ):
 
-          if( tag == "t-available" ):
+          if( tag == "t-name" ):
+            self.setTeacherName.emit( str(dataVal).strip('"') )
+
+          elif( tag == "t-available" ):
             self.setAvailable.emit( dataVal )
 
           elif( tag == "t-display" ):
