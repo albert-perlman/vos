@@ -5,10 +5,8 @@
     "t-available": false,
     "t-display": "",
     "t-reply": "",
-    "t-hours-start": "12",
-    "t-hours-end": "12",
-    "t-minutes-start": "00",
-    "t-minutes-end": "00",
+    "t-hours-start": "12:00",
+    "t-hours-end": "12:00",
   
     "s-name": "",
     "s-msg": ""
