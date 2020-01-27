@@ -8,6 +8,7 @@ from PyQt5.QtMultimedia  import *
 
 import os
 import sys
+import time
 
 from PyStyle import StyleSheet
 import FireThread
@@ -107,24 +108,43 @@ class MainWindow(QMainWindow):
     self.updateTitle()
     self.show()
 
-    timer = QTimer(self)
-    timer.timeout.connect(self.SLOT_refreshBtnClicked)
-    timer.start(1750)
+    # initialize dictionary to store Firebase data
+    self.data = { 
+      "t-display": "",
+      "t-available": False,
+      "t-name": "",
+      "t-reply": "",
+      "t-hours-start": "",
+      "t-hours-end": "",
+      "t-minutes-start": "",
+      "t-minutes-end": "",
+      "s-name": "",
+      "s-msg": ""
+    }
+
+    # refresh data timer
+    # repeats infinitely to trigger data retrieval from Firebase
+    refreshTimer = QTimer(self)
+    refreshTimer.timeout.connect(self.readFirebase)
+    refreshTimer.start(3000)
 
 
-  # read data value for given tag stored in Firebase
+  # spawn FireThread to read data values for all tags stored in Firebase
+  # called cyclically by refreshTimer
   def readFirebase(self):
 
      # create Firebase data retrieval thread
-    self.FireThread = FireThread.FireThread( self.displayMsg.toPlainText() )
+    self.FireThread = FireThread.FireThread(self.data)
 
-    # run Firebase thread
-    self.FireThread.start()
+    # connect signals
     self.FireThread.setAvailable.connect(self.SLOT_availabilityChanged)
     self.FireThread.setDisplayMsg.connect(self.displayMsg.setText)
     self.FireThread.finished.connect(self.SLOT_threadFinished)
 
+    # run Firebase thread
+    self.FireThread.start()
 
+  # SLOT: teacher availability changed
   def SLOT_availabilityChanged(self, availability):
     if( "true" == availability ):
       self.available.setText("AVAILABLE")
@@ -137,11 +157,11 @@ class MainWindow(QMainWindow):
   def SLOT_refreshBtnClicked(self):
     self.readFirebase()
 
-  # SLOT: thread finished
-  def SLOT_threadFinished(self):
-    pass
+  # SLOT: firebase data retrieval thread finished
+  def SLOT_threadFinished(self, newData):
+    self.data = newData
 
-  # SLOT: display Message changed
+  # SLOT: Display Message changed
   def SLOT_displayMsgChanged(self):
     self.displayMsg.setAlignment(Qt.AlignCenter)
 
