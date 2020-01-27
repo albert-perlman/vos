@@ -11,7 +11,9 @@ import sys
 import time
 
 from PyStyle import StyleSheet
-import FireThread
+
+import FireRead
+import FireWrite
 
 em = 1
 
@@ -35,8 +37,8 @@ class MainWindow(QMainWindow):
     self.maxScreenHeight = self.screenSize.height()
 
     # Main Window sizing
-    self.setMinimumSize(1024*em,600*em)
-    self.resize(1024*em,600*em)
+    self.setMinimumSize(1024*em, 600*em)
+    self.resize(1024*em, 600*em)
 
     #############
     #  WIDGETS  #
@@ -46,7 +48,7 @@ class MainWindow(QMainWindow):
 
     # Available / Unavailable #
     self.available = QLabel("UNAVAILABLE")
-    self.available.setFixedSize(250*em,50*em)
+    self.available.setFixedSize(250*em, 50*em)
     self.available.setAlignment(Qt.AlignCenter)
     self.available.setStyleSheet(StyleSheet.css("unavailable"))
 
@@ -68,13 +70,20 @@ class MainWindow(QMainWindow):
     for msg in self.studentMsgList:
       btn = QPushButton(msg)
       btn.setCheckable(True)
+      btn.setChecked(False)
       btn.setFixedSize(300*em, 100*em)
-      btn.setStyleSheet(StyleSheet.css("button"))
+      btn.setStyleSheet(StyleSheet.css("studentMsgSel"))
       self.studentMsgSel.append(btn)
+
+    # Student Name #
+    self.studentNameLabel = QLabel("Name:")
+    self.studentName = QLineEdit()
+    self.studentNameLabel.setFixedSize(75*em, 40*em)
+    self.studentName.setFixedSize(300*em, 40*em)
 
     # Send Message #
     self.sendMsgBtn = QPushButton()
-    self.sendMsgBtn.setText("Send Message to ")
+    self.sendMsgBtn.setText("Send Message")
     self.sendMsgBtn.setFixedSize(400*em, 60*em)
     self.sendMsgBtn.setStyleSheet(StyleSheet.css("button"))
 
@@ -111,10 +120,12 @@ class MainWindow(QMainWindow):
     for btn in self.studentMsgSel:
       StudentMsgSelHLayout.addWidget(btn)
 
-    # student messaging -SEND
+    # student messaging - SEND
     StudentMsgSendHLayout = QHBoxLayout()
     StudentMsgSendHLayout.setAlignment(Qt.AlignCenter)
-    StudentMsgSendHLayout.addWidget(self.sendMsgBtn)    
+    StudentMsgSendHLayout.addWidget(self.studentNameLabel)
+    StudentMsgSendHLayout.addWidget(self.studentName)
+    StudentMsgSendHLayout.addWidget(self.sendMsgBtn)
 
     # bottom info bar
     BottomHLayout = QHBoxLayout()
@@ -158,37 +169,40 @@ class MainWindow(QMainWindow):
       "s-msg": ""
     }
 
+    # retreive Firebase data and update GUI 
+    self.readFirebase()
+
     # refresh data timer
     # repeats infinitely to trigger data retrieval from Firebase
     refreshTimer = QTimer(self)
     refreshTimer.timeout.connect(self.readFirebase)
-    refreshTimer.start(5000)
+    refreshTimer.start(2500)
 
 
-  # spawn FireThread to read data values for all tags stored in Firebase
+  # spawn FireRead to read data values for all tags stored in Firebase
   # called cyclically by refreshTimer
   def readFirebase(self):
 
-     # create Firebase data retrieval thread
-    self.FireThread = FireThread.FireThread(self.data)
+    # create Firebase data retrieval thread
+    self.FireRead = FireRead.FireRead(self.data)
 
     # connect signals
-    self.FireThread.setAvailable.connect(self.SLOT_availabilityChanged)
-    self.FireThread.setTeacherName.connect(self.updateTitle)
-    self.FireThread.setDisplayMsg.connect(self.displayMsg.setText)
-    self.FireThread.finished.connect(self.SLOT_threadFinished)
+    self.FireRead.setAvailable.connect(self.SLOT_availabilityChanged)
+    self.FireRead.setTeacherName.connect(self.updateTitle)
+    self.FireRead.setDisplayMsg.connect(self.displayMsg.setText)
+    self.FireRead.finished.connect(self.SLOT_threadFinished)
 
     # run Firebase thread
-    self.FireThread.start()
+    self.FireRead.start()
 
-  # spawn FireThread to write data value for given tag in Firebase
-  def writeFirebase(self, tag, value):
+  # spawn FireWrite to store data values for given tags to Firebase
+  def writeFirebase(self, tags, values):
 
      # create Firebase data retrieval thread
-    self.FireThread = FireThread.FireThread( self.data, tag, value )
+    self.FireWrite = FireWrite.FireWrite( tags, values )
 
     # run Firebase thread
-    self.FireThread.start()
+    self.FireWrite.start()
 
   # SLOT: teacher availability changed
   def SLOT_availabilityChanged(self, availability):
@@ -201,12 +215,17 @@ class MainWindow(QMainWindow):
 
   # SLOT: send student message button clicked
   def SLOT_sendMsgBtnClicked(self):
-    pass
+    for btn in self.studentMsgSel:
+      if ( btn.isChecked() ):
+        self.writeFirebase( ["s-name", "s-msg"], [self.studentName.text(), btn.text()] )
+        break
 
   # SLOT: student message selection clicked
   def SLOT_studentMsgSelClicked(self):
     msg = self.sender().text()
-    self.writeFirebase("s-msg", msg)
+    for btn in self.studentMsgSel:
+      btn.setChecked(False)
+    self.sender().setChecked(True)
 
   # SLOT: refresh button clicked - retrieve data from Firebase
   def SLOT_refreshBtnClicked(self):
@@ -243,7 +262,8 @@ class MainWindow(QMainWindow):
 
   # update main window title
   def updateTitle(self, str=""):
-    self.setWindowTitle(""+ str)
+    self.setWindowTitle( str )
+    self.sendMsgBtn.setText( "Send Message to " + str )
 
   # map key press events to gallery navigation
   def keyPressEvent(self, event):

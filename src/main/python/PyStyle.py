@@ -2,7 +2,7 @@
 
 class StyleSheet(object):
   def __init__(self, arg):
-    super(ClassName, self).__init__()
+    super(StyleSheet, self).__init__()
     self.arg = arg
     
   def css(widget=None):
@@ -88,6 +88,26 @@ class StyleSheet(object):
         "}"
 
         return unavailable
+
+    elif ("studentMsgSel" == widget):
+
+        css = \
+        "QPushButton {" + \
+        "font-size: 16px; font-weight:bold;" + \
+        "color:rgb(255,255,255);" + \
+        "background-color:rgb(50,50,50);" + \
+        "border:3px solid transparent;" + \
+        "border-radius:10px;" + \
+        "padding:5px;" + \
+        "}" + \
+        "QPushButton::hover {" + \
+        "background-color:rgb(60,60,60);" + \
+        "}" + \
+        "QPushButton:checked {" + \
+        "background-color: rgb(60,60,60);" + \
+        "border: 5px solid black; }"
+
+        return css
 
     elif ("status" == widget):
 
