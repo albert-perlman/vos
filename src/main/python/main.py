@@ -58,6 +58,26 @@ class MainWindow(QMainWindow):
     self.displayMsg.setAlignment(Qt.AlignCenter)
     self.displayMsg.setStyleSheet(StyleSheet.css("displayMsg"))
 
+    # Student Message Selections #
+    self.studentMsgList = [
+      "I am here for our meeting.",
+      "I have a question about class.",
+      "When are you available to meet today?",
+    ]
+    self.studentMsgSel = []
+    for msg in self.studentMsgList:
+      btn = QPushButton(msg)
+      btn.setCheckable(True)
+      btn.setFixedSize(300*em, 100*em)
+      btn.setStyleSheet(StyleSheet.css("button"))
+      self.studentMsgSel.append(btn)
+
+    # Send Message #
+    self.sendMsgBtn = QPushButton()
+    self.sendMsgBtn.setText("Send Message to ")
+    self.sendMsgBtn.setFixedSize(400*em, 60*em)
+    self.sendMsgBtn.setStyleSheet(StyleSheet.css("button"))
+
     # Refresh Button #
     self.refreshBtn = QPushButton()
     self.refreshBtn.setText("@")
@@ -85,6 +105,17 @@ class MainWindow(QMainWindow):
     DisplayMsgHLayout.setAlignment(Qt.AlignCenter)
     DisplayMsgHLayout.addWidget(self.displayMsg)
 
+    # student messaging - SELECT
+    StudentMsgSelHLayout = QHBoxLayout()
+    StudentMsgSelHLayout.setAlignment(Qt.AlignCenter)
+    for btn in self.studentMsgSel:
+      StudentMsgSelHLayout.addWidget(btn)
+
+    # student messaging -SEND
+    StudentMsgSendHLayout = QHBoxLayout()
+    StudentMsgSendHLayout.setAlignment(Qt.AlignCenter)
+    StudentMsgSendHLayout.addWidget(self.sendMsgBtn)    
+
     # bottom info bar
     BottomHLayout = QHBoxLayout()
     BottomHLayout.setAlignment(Qt.AlignRight)
@@ -93,6 +124,8 @@ class MainWindow(QMainWindow):
     # add layouts and widgets
     MainVLayout.addLayout(TopHLayout)
     MainVLayout.addLayout(DisplayMsgHLayout)
+    MainVLayout.addLayout(StudentMsgSelHLayout)
+    MainVLayout.addLayout(StudentMsgSendHLayout)
     MainVLayout.addLayout(BottomHLayout)
 
     ####################
@@ -100,7 +133,10 @@ class MainWindow(QMainWindow):
     ####################
     self.resized.connect(self.SLOT_resized)
     self.refreshBtn.clicked.connect(self.SLOT_refreshBtnClicked)
+    self.sendMsgBtn.clicked.connect(self.SLOT_sendMsgBtnClicked)
     self.displayMsg.textChanged.connect(self.SLOT_displayMsgChanged)
+    for btn in self.studentMsgSel:
+      btn.clicked.connect(self.SLOT_studentMsgSelClicked)
 
     ####################
     #     START-UP     #
@@ -126,7 +162,7 @@ class MainWindow(QMainWindow):
     # repeats infinitely to trigger data retrieval from Firebase
     refreshTimer = QTimer(self)
     refreshTimer.timeout.connect(self.readFirebase)
-    refreshTimer.start(3000)
+    refreshTimer.start(5000)
 
 
   # spawn FireThread to read data values for all tags stored in Firebase
@@ -144,6 +180,15 @@ class MainWindow(QMainWindow):
     # run Firebase thread
     self.FireThread.start()
 
+  # spawn FireThread to write data value for given tag in Firebase
+  def writeFirebase(self, tag, value):
+
+     # create Firebase data retrieval thread
+    self.FireThread = FireThread.FireThread( self.data, tag, value )
+
+    # run Firebase thread
+    self.FireThread.start()
+
   # SLOT: teacher availability changed
   def SLOT_availabilityChanged(self, availability):
     if( "true" == availability ):
@@ -152,6 +197,14 @@ class MainWindow(QMainWindow):
     elif( "false" == availability ):
       self.available.setText("UNAVAILABLE")
       self.available.setStyleSheet(StyleSheet.css("unavailable"))
+
+  # SLOT: send student message button clicked
+  def SLOT_sendMsgBtnClicked(self):
+    pass
+
+  def SLOT_studentMsgSelClicked(self):
+    msg = self.sender().text()
+    self.writeFirebase("s-msg", msg)
 
   # SLOT: refresh button clicked - retrieve data from Firebase
   def SLOT_refreshBtnClicked(self):

@@ -11,10 +11,13 @@ class FireThread(QThread):
   setDisplayMsg = pyqtSignal(str)
   setAvailable = pyqtSignal(str)
 
-  def __init__(self, oldData, parent=None):
+  def __init__(self, oldData, tag=None, value=None, parent=None):
     super(FireThread, self).__init__(parent)
 
-    self.sem = QSemaphore() # semaphore used for blocking thread during GUI updates in main thread
+    self.oldData  = oldData
+    self.tag      = tag
+    self.value    = value
+
     self.tags = { 
       "t-display",
       "t-available",
@@ -41,24 +44,28 @@ class FireThread(QThread):
       "s-msg": ""
     }
 
-    self.oldData = oldData
-
   def run(self):
 
     dbURL = "https://v-o-s-62a4d.firebaseio.com/VOS"
     db = firebase.FirebaseApplication(dbURL, None)
 
-    for tag in self.tags:
-      dataVal = db.get( '/VOS/' + tag, None )
-      self.newData[tag] = dataVal
+    # READ
+    if (self.value == None):
+      for tag in self.tags:
+        dataVal = db.get( '/VOS/' + tag, None )
+        self.newData[tag] = dataVal
 
-      if( dataVal != self.oldData[tag] ):
+        if( dataVal != self.oldData[tag] ):
 
-        if( tag == "t-available" ):
-          self.setAvailable.emit( dataVal )
+          if( tag == "t-available" ):
+            self.setAvailable.emit( dataVal )
 
-        elif( tag == "t-display" ):
-          print("heyooo\n---\n")
-          self.setDisplayMsg.emit( str(dataVal).strip('"').replace('\\n','<br/>') )
-    
-    self.finished.emit(self.newData)
+          elif( tag == "t-display" ):
+            self.setDisplayMsg.emit( str(dataVal).strip('"').replace('\\n','<br/>') )
+      
+      self.finished.emit(self.newData)
+
+    # WRITE
+    elif ( self.tag and self.value ):
+      db.patch( "/VOS/", { self.tag : '\"' + self.value + '\"' } )
+
