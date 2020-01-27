@@ -179,7 +179,7 @@ class MainWindow(QMainWindow):
     refreshTimer.start(2500)
 
 
-  # spawn FireRead to read data values for all tags stored in Firebase
+  # spawn FireRead thread to read data values for all tags stored in Firebase
   # called cyclically by refreshTimer
   def readFirebase(self):
 
@@ -195,7 +195,7 @@ class MainWindow(QMainWindow):
     # run Firebase thread
     self.FireRead.start()
 
-  # spawn FireWrite to store data values for given tags to Firebase
+  # spawn FireWrite thread to store data values for given tags in Firebase
   def writeFirebase(self, tags, values):
 
      # create Firebase data retrieval thread
@@ -218,7 +218,11 @@ class MainWindow(QMainWindow):
     for btn in self.studentMsgSel:
       if ( btn.isChecked() ):
         self.writeFirebase( ["s-name", "s-msg"], [self.studentName.text(), btn.text()] )
+        self.status.showMessage( "Sent message: " + btn.text() )
         break
+
+    for btn in self.studentMsgSel:
+      btn.setChecked(False)
 
   # SLOT: student message selection clicked
   def SLOT_studentMsgSelClicked(self):

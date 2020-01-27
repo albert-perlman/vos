@@ -95,7 +95,7 @@ class StyleSheet(object):
         "QPushButton {" + \
         "font-size: 16px; font-weight:bold;" + \
         "color:rgb(255,255,255);" + \
-        "background-color:rgb(50,50,50);" + \
+        "background-color:rgb(40,40,40);" + \
         "border:3px solid transparent;" + \
         "border-radius:10px;" + \
         "padding:5px;" + \
