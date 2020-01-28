@@ -7,9 +7,10 @@ class FireRead(QThread):
 
   # signals slotted to main thread
   finished = pyqtSignal(dict)
-  setTeacherName = pyqtSignal(str)
-  setDisplayMsg = pyqtSignal(str)
-  setAvailable = pyqtSignal(str)
+  setTeacherName  = pyqtSignal(str)
+  setDisplayMsg   = pyqtSignal(str)
+  setAvailable    = pyqtSignal(str)
+  setHours        = pyqtSignal(str, str)
 
   def __init__(self, oldData, parent=None):
     super(FireRead, self).__init__(parent)
@@ -23,8 +24,6 @@ class FireRead(QThread):
       "t-reply",
       "t-hours-start",
       "t-hours-end",
-      "t-minutes-start",
-      "t-minutes-end",
       "s-name",
       "s-msg"
     }
@@ -36,8 +35,6 @@ class FireRead(QThread):
       "t-reply": "",
       "t-hours-start": "",
       "t-hours-end": "",
-      "t-minutes-start": "",
-      "t-minutes-end": "",
       "s-name": "",
       "s-msg": ""
     }
@@ -60,6 +57,12 @@ class FireRead(QThread):
 
         elif( tag == "t-available" ):
           self.setAvailable.emit( dataVal )
+
+        elif( tag == "t-hours-start" ):
+          self.setHours.emit( str(dataVal).strip('"'), self.oldData["t-hours-end"].strip('"') )
+
+        elif( tag == "t-hours-end" ):
+          self.setHours.emit( self.newData["t-hours-start"].strip('"'), str(dataVal).strip('"') )
 
         elif( tag == "t-display" ):
           self.setDisplayMsg.emit( str(dataVal).strip('"').replace('\\n','<br/>') )

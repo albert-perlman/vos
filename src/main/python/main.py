@@ -44,13 +44,31 @@ class MainWindow(QMainWindow):
     #  WIDGETS  #
     #############
 
-   # self.startBtn.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Minimum)
+    # clock #
+    self.clock = QLabel( time.strftime("%H"+":"+"%M") )
+    self.clock.setAlignment(Qt.AlignRight)
+    self.clock.setFixedSize(200*em, 50*em)
+    self.clock.setStyleSheet( StyleSheet.css("clock") )
+    self.clockSpacer = QLabel() # spacer
+    self.clockSpacer.setStyleSheet( StyleSheet.css("spacer") )
+    self.clockSpacer.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Minimum)
+
+    # Office Hours #
+    self.hours = QLabel("12:00 - 12:00")
+    self.hoursLabel = QLabel("Office Hours")
+    self.hours.setFixedWidth(self.clock.width())
+    self.hoursLabel.setFixedWidth(self.clock.width())
+    self.hours.setStyleSheet(StyleSheet.css("hours"))
+    self.hoursLabel.setStyleSheet( StyleSheet.css("hoursLabel") )
+    self.hoursSpacer = QLabel() # spacer
+    self.hoursSpacer.setStyleSheet( StyleSheet.css("spacer") )
+    self.hoursSpacer.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Minimum)    
 
     # Available / Unavailable #
     self.available = QLabel("UNAVAILABLE")
     self.available.setFixedSize(250*em, 50*em)
     self.available.setAlignment(Qt.AlignCenter)
-    self.available.setStyleSheet(StyleSheet.css("unavailable"))
+    self.available.setStyleSheet( StyleSheet.css("unavailable") )
 
     # Display Message #
     self.displayMsg = QTextEdit()
@@ -58,7 +76,7 @@ class MainWindow(QMainWindow):
     self.displayMsg.setText("No messages")
     self.displayMsg.setReadOnly(True)
     self.displayMsg.setAlignment(Qt.AlignCenter)
-    self.displayMsg.setStyleSheet(StyleSheet.css("displayMsg"))
+    self.displayMsg.setStyleSheet( StyleSheet.css("displayMsg") )
 
     # Student Message Selections #
     self.studentMsgList = [
@@ -72,29 +90,35 @@ class MainWindow(QMainWindow):
       btn.setCheckable(True)
       btn.setChecked(False)
       btn.setFixedSize(300*em, 100*em)
-      btn.setStyleSheet(StyleSheet.css("studentMsgSel"))
+      btn.setStyleSheet( StyleSheet.css("studentMsgSel") )
       self.studentMsgSel.append(btn)
 
     # Student Name #
-    self.studentNameLabel = QLabel("Name:")
     self.studentName = QLineEdit()
+    self.studentNameLabel = QLabel("Name")
+    self.studentNameLabel.setAlignment(Qt.AlignCenter)
+    self.studentName.setFixedSize(200*em, 40*em)
     self.studentNameLabel.setFixedSize(75*em, 40*em)
-    self.studentName.setFixedSize(300*em, 40*em)
+    self.studentName.setStyleSheet(StyleSheet.css("studentName"))
+    self.studentNameLabel.setStyleSheet( StyleSheet.css("studentNameLabel") )
 
     # Send Message #
     self.sendMsgBtn = QPushButton()
     self.sendMsgBtn.setText("Send Message")
     self.sendMsgBtn.setFixedSize(400*em, 60*em)
-    self.sendMsgBtn.setStyleSheet(StyleSheet.css("button"))
+    self.sendMsgBtn.setStyleSheet( StyleSheet.css("button") )
+
+    # Conversation Display #
+    self.convoText = QTextEdit()
 
     # Refresh Button #
     self.refreshBtn = QPushButton()
     self.refreshBtn.setText("@")
-    self.refreshBtn.setStyleSheet(StyleSheet.css("button"))
+    self.refreshBtn.setStyleSheet( StyleSheet.css("button") )
 
     # status bar #
     self.status = QStatusBar()
-    self.status.setStyleSheet(StyleSheet.css("status"))
+    self.status.setStyleSheet( StyleSheet.css("status") )
     self.setStatusBar(self.status)
 
     #############
@@ -104,10 +128,19 @@ class MainWindow(QMainWindow):
     # main vertical container layout
     MainVLayout = QVBoxLayout(MainWidgetContainer)
 
+    # office hours
+    HoursVLayout = QVBoxLayout()
+    HoursVLayout.addWidget(self.hours)
+    HoursVLayout.addWidget(self.hoursLabel)
+
     # top info bar
     TopHLayout = QHBoxLayout()
     TopHLayout.setAlignment(Qt.AlignCenter)
+    TopHLayout.addLayout(HoursVLayout)
+    TopHLayout.addWidget(self.hoursSpacer)
     TopHLayout.addWidget(self.available)
+    TopHLayout.addWidget(self.clockSpacer)
+    TopHLayout.addWidget(self.clock)
 
     # display message
     DisplayMsgHLayout = QHBoxLayout()
@@ -161,10 +194,8 @@ class MainWindow(QMainWindow):
       "t-available": False,
       "t-name": "",
       "t-reply": "",
-      "t-hours-start": "",
-      "t-hours-end": "",
-      "t-minutes-start": "",
-      "t-minutes-end": "",
+      "t-hours-start": "12:00",
+      "t-hours-end": "12:00",
       "s-name": "",
       "s-msg": ""
     }
@@ -178,6 +209,12 @@ class MainWindow(QMainWindow):
     refreshTimer.timeout.connect(self.readFirebase)
     refreshTimer.start(2500)
 
+    # clock timer
+    # repeats infinitely to trigger clock updates every 10 seconds
+    clockTimer = QTimer(self)
+    clockTimer.timeout.connect(self.updateClock)
+    clockTimer.start(10000)
+
 
   # spawn FireRead thread to read data values for all tags stored in Firebase
   # called cyclically by refreshTimer
@@ -188,6 +225,7 @@ class MainWindow(QMainWindow):
 
     # connect signals
     self.FireRead.setAvailable.connect(self.SLOT_availabilityChanged)
+    self.FireRead.setHours.connect(self.SLOT_hoursChanged)
     self.FireRead.setTeacherName.connect(self.updateTitle)
     self.FireRead.setDisplayMsg.connect(self.displayMsg.setText)
     self.FireRead.finished.connect(self.SLOT_threadFinished)
@@ -212,6 +250,10 @@ class MainWindow(QMainWindow):
     elif( "false" == availability ):
       self.available.setText("UNAVAILABLE")
       self.available.setStyleSheet(StyleSheet.css("unavailable"))
+
+  # SLOT: teacher office hours changed
+  def SLOT_hoursChanged(self, startTime, endTime):
+    self.hours.setText( startTime + " - " + endTime )
 
   # SLOT: send student message button clicked
   def SLOT_sendMsgBtnClicked(self):
@@ -239,7 +281,7 @@ class MainWindow(QMainWindow):
   def SLOT_threadFinished(self, newData):
     self.data = newData
 
-  # SLOT: Display Message changed
+  # SLOT: Display Message changed - reset text alignment
   def SLOT_displayMsgChanged(self):
     try:
       self.displayMsg.setAlignment(Qt.AlignCenter)
@@ -268,6 +310,10 @@ class MainWindow(QMainWindow):
   def updateTitle(self, str=""):
     self.setWindowTitle( str )
     self.sendMsgBtn.setText( "Send Message to " + str )
+
+  # update clock display
+  def updateClock(self):
+    self.clock.setText( time.strftime("%H"+":"+"%M") )
 
   # map key press events to gallery navigation
   def keyPressEvent(self, event):

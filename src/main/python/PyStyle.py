@@ -9,7 +9,7 @@ class StyleSheet(object):
 
     if ("window" == widget):
 
-        MainWindow = \
+        css = \
         "QWidget {" + \
         "font-family:Cantarell;" + \
         "color:rgb(255,255,255);" + \
@@ -21,11 +21,11 @@ class StyleSheet(object):
         "stop: 1.0 rgb(25,25,25));" + \
         "}"
 
-        return MainWindow
+        return css
 
     elif ("button" == widget):
 
-        button = \
+        css = \
         "QPushButton {" + \
         "font-size: 16px; font-weight:bold;" + \
         "color:rgb(255,255,255);" + \
@@ -38,11 +38,11 @@ class StyleSheet(object):
         "background-color:rgb(60,60,60);" + \
         "}"
 
-        return button
+        return css
 
     elif ("displayMsg" == widget):
 
-        displayMsg = \
+        css = \
         "QTextEdit {" + \
         "font-size:26px;" + \
         "font-family:Cantarell;" + \
@@ -51,11 +51,47 @@ class StyleSheet(object):
         "border-radius:10px;" + \
         "}"
 
-        return displayMsg
+        return css
+
+    elif ("clock" == widget):
+
+        css = \
+        "QLabel {" + \
+        "font-size:26px;" + \
+        "font-family:Cantarell;" + \
+        "color:rgb(255,255,255);" + \
+        "background-color:transparent;" + \
+        "}"
+        
+        return css
+
+    elif ("hours" == widget):
+
+        css = \
+        "QLabel {" + \
+        "font-size:26px;" + \
+        "font-family:Cantarell;" + \
+        "color:rgb(255,255,255);" + \
+        "background-color:transparent;" + \
+        "}"
+
+        return css
+
+    elif ("hoursLabel" == widget):
+
+        css = \
+        "QLabel {" + \
+        "font-size:20px;" + \
+        "font-family:Cantarell;" + \
+        "color:rgb(255,255,255);" + \
+        "background-color:transparent;" + \
+        "}"
+
+        return css
 
     elif ("available" == widget):
 
-        available = \
+        css = \
         "QLabel {" + \
         "font-size:20px;" + \
         "font-weight:bold;" + \
@@ -69,11 +105,11 @@ class StyleSheet(object):
         "border-radius:10px;" + \
         "}"
 
-        return available
+        return css
 
     elif ("unavailable" == widget):
 
-        unavailable = \
+        css = \
         "QLabel {" + \
         "font-size:20px;" + \
         "font-weight:bold;" + \
@@ -87,7 +123,7 @@ class StyleSheet(object):
         "border-radius:10px;" + \
         "}"
 
-        return unavailable
+        return css
 
     elif ("studentMsgSel" == widget):
 
@@ -109,13 +145,52 @@ class StyleSheet(object):
 
         return css
 
+
+    elif ("studentName" == widget):
+
+        css = \
+        "QLineEdit {" + \
+        "font-size: 16px; font-weight:bold;" + \
+        "color:black;" + \
+        "background-color:rgb(150,150,150);" + \
+        "border:3px solid transparent;" + \
+        "border-radius:10px;" + \
+        "padding:5px;" + \
+        "}"
+
+        return css
+
+
+    elif ("studentNameLabel" == widget):
+
+        css = \
+        "QLabel {" + \
+        "font-size: 16px; font-weight:bold;" + \
+        "color:rgb(255,255,255);" + \
+        "background-color:transparent;" + \
+        "border:3px solid transparent;" + \
+        "border-radius:10px;" + \
+        "padding:0px;" + \
+        "}"
+
+        return css
+
     elif ("status" == widget):
 
-        StatusBar = \
+        css = \
         "QStatusBar {" + \
         "font-family:Cantarell;" + \
         "color:rgb(255,255,255);" + \
         "background-color:rgb(75,75,75);" + \
         "}"
 
-        return StatusBar
+        return css
+
+    elif ("spacer" == widget):
+
+        css = \
+        "QLabel {" + \
+        "background-color:transparent;" + \
+        "}"
+
+        return css
