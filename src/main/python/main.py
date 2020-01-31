@@ -80,41 +80,45 @@ class MainWindow(QMainWindow):
 
     # Student Message Selections #
     self.studentMsgList = [
-      "I am here for our meeting.",
       "I have a question about class.",
+      "I am here for our meeting.",
+      "I need to cancel our meeting.",
       "When are you available to meet today?",
+      "Yes",
+      "No",
+      "OK"
     ]
     self.studentMsgSel = []
     for msg in self.studentMsgList:
       btn = QPushButton(msg)
       btn.setCheckable(True)
       btn.setChecked(False)
-      btn.setFixedSize(300*em, 100*em)
+      btn.setFixedHeight(65*em)
       btn.setStyleSheet( StyleSheet.css("studentMsgSel") )
       self.studentMsgSel.append(btn)
+      if( msg == self.studentMsgList[4] or msg == self.studentMsgList[5] or msg == self.studentMsgList[6] ):
+        btn.setFixedWidth(100*em)
 
     # Student Name #
     self.studentName = QLineEdit()
     self.studentNameLabel = QLabel("Name")
-    self.studentNameLabel.setAlignment(Qt.AlignCenter)
-    self.studentName.setFixedSize(200*em, 40*em)
-    self.studentNameLabel.setFixedSize(75*em, 40*em)
+    self.studentNameLabel.setAlignment(Qt.AlignRight)
+    self.studentName.setFixedSize(241*em, 40*em)
+    self.studentNameLabel.setFixedSize(80*em, 30*em)
     self.studentName.setStyleSheet(StyleSheet.css("studentName"))
     self.studentNameLabel.setStyleSheet( StyleSheet.css("studentNameLabel") )
 
     # Send Message #
     self.sendMsgBtn = QPushButton()
     self.sendMsgBtn.setText("Send Message")
-    self.sendMsgBtn.setFixedSize(400*em, 60*em)
+    self.sendMsgBtn.setFixedSize(200*em, 40*em)
     self.sendMsgBtn.setStyleSheet( StyleSheet.css("button") )
+    self.sendMsgSpacer = QLabel() # spacer
+    self.sendMsgSpacer.setStyleSheet( StyleSheet.css("spacer") )
+    self.sendMsgSpacer.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Minimum)
 
     # Conversation Display #
     self.convoText = QTextEdit()
-
-    # Refresh Button #
-    self.refreshBtn = QPushButton()
-    self.refreshBtn.setText("@")
-    self.refreshBtn.setStyleSheet( StyleSheet.css("button") )
 
     # status bar #
     self.status = QStatusBar()
@@ -147,36 +151,57 @@ class MainWindow(QMainWindow):
     DisplayMsgHLayout.setAlignment(Qt.AlignCenter)
     DisplayMsgHLayout.addWidget(self.displayMsg)
 
+    # STUDENT MESSAGING
+    #__________________________________________________________________________
+
+    # Main Messaging Layout
+    MsgCenterVLayout = QVBoxLayout()
+
+    # Group Box
+    self.msgGroupBox = QGroupBox("Student Messaging")
+    self.msgGroupBox.setAlignment(Qt.AlignCenter)
+    self.msgGroupBox.setStyleSheet( StyleSheet.css("msgGroupBox") )
+    self.msgGroupBox.setLayout(MsgCenterVLayout)
+
     # student messaging - SELECT
-    StudentMsgSelHLayout = QHBoxLayout()
-    StudentMsgSelHLayout.setAlignment(Qt.AlignCenter)
-    for btn in self.studentMsgSel:
-      StudentMsgSelHLayout.addWidget(btn)
+    StudentMsgSelHLayout1 = QHBoxLayout()
+    StudentMsgSelHLayout2 = QHBoxLayout()
+    StudentMsgSelHLayout1.setAlignment(Qt.AlignCenter)
+    StudentMsgSelHLayout2.setAlignment(Qt.AlignCenter)
+    for i in range(0,4):
+      StudentMsgSelHLayout1.addWidget( self.studentMsgSel[i] )
+    for i in range(4,7):
+      StudentMsgSelHLayout2.addWidget( self.studentMsgSel[i] )
 
     # student messaging - SEND
     StudentMsgSendHLayout = QHBoxLayout()
     StudentMsgSendHLayout.setAlignment(Qt.AlignCenter)
     StudentMsgSendHLayout.addWidget(self.studentNameLabel)
     StudentMsgSendHLayout.addWidget(self.studentName)
+    StudentMsgSendHLayout.addWidget(self.sendMsgSpacer)
     StudentMsgSendHLayout.addWidget(self.sendMsgBtn)
+
+    # add layouts
+    MsgCenterVLayout.addLayout(StudentMsgSelHLayout1)
+    MsgCenterVLayout.addLayout(StudentMsgSelHLayout2)
+    MsgCenterVLayout.addLayout(StudentMsgSendHLayout)
+
+    #__________________________________________________________________________
 
     # bottom info bar
     BottomHLayout = QHBoxLayout()
     BottomHLayout.setAlignment(Qt.AlignRight)
-    BottomHLayout.addWidget(self.refreshBtn)
 
     # add layouts and widgets
     MainVLayout.addLayout(TopHLayout)
     MainVLayout.addLayout(DisplayMsgHLayout)
-    MainVLayout.addLayout(StudentMsgSelHLayout)
-    MainVLayout.addLayout(StudentMsgSendHLayout)
+    MainVLayout.addWidget(self.msgGroupBox)
     MainVLayout.addLayout(BottomHLayout)
 
     ####################
     #  SIGNAL / SLOTS  #
     ####################
     self.resized.connect(self.SLOT_resized)
-    self.refreshBtn.clicked.connect(self.SLOT_refreshBtnClicked)
     self.sendMsgBtn.clicked.connect(self.SLOT_sendMsgBtnClicked)
     self.displayMsg.textChanged.connect(self.SLOT_displayMsgChanged)
     for btn in self.studentMsgSel:
@@ -268,14 +293,11 @@ class MainWindow(QMainWindow):
 
   # SLOT: student message selection clicked
   def SLOT_studentMsgSelClicked(self):
-    msg = self.sender().text()
     for btn in self.studentMsgSel:
-      btn.setChecked(False)
-    self.sender().setChecked(True)
-
-  # SLOT: refresh button clicked - retrieve data from Firebase
-  def SLOT_refreshBtnClicked(self):
-    self.readFirebase()
+      if( btn != self.sender() ):
+        btn.setChecked(False)
+    if( not self.sender().isChecked() ):
+      self.sender().setChecked(False)
 
   # SLOT: firebase data retrieval thread finished
   def SLOT_threadFinished(self, newData):
@@ -309,7 +331,6 @@ class MainWindow(QMainWindow):
   # update main window title
   def updateTitle(self, str=""):
     self.setWindowTitle( str )
-    self.sendMsgBtn.setText( "Send Message to " + str )
 
   # update clock display
   def updateClock(self):

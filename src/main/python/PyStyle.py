@@ -15,10 +15,10 @@ class StyleSheet(object):
         "color:rgb(255,255,255);" + \
         "background-color:" + \
         "qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1," + \
-        "stop: 0.0 rgb(35,35,35)" + \
-        "stop: 0.2 rgb(50,50,50)" + \
-        "stop: 0.7 rgb(50,50,50)," + \
-        "stop: 1.0 rgb(25,25,25));" + \
+        "stop: 0.0 rgb(175,175,175)" + \
+        "stop: 0.2 rgb(240,240,240)" + \
+        "stop: 0.7 rgb(240,240,240)," + \
+        "stop: 1.0 rgb(200,200,200));" + \
         "}"
 
         return css
@@ -27,15 +27,19 @@ class StyleSheet(object):
 
         css = \
         "QPushButton {" + \
-        "font-size: 16px; font-weight:bold;" + \
-        "color:rgb(255,255,255);" + \
-        "background-color:rgb(50,50,50);" + \
+        "font-size: 20px; font-weight:bold;" + \
+        "color:black;" + \
+        "background-color:rgb(150,150,150);" + \
         "border:3px solid transparent;" + \
-        "border-radius:10px;" + \
+        "border-radius:0px;" + \
         "padding:5px;" + \
         "}" + \
         "QPushButton::hover {" + \
-        "background-color:rgb(60,60,60);" + \
+        "background-color:rgb(100,100,100);" + \
+        "}" + \
+        "QPushButton::pressed {" + \
+        "color: white;" + \
+        "background-color:rgb(50,50,50);" + \
         "}"
 
         return css
@@ -46,9 +50,9 @@ class StyleSheet(object):
         "QTextEdit {" + \
         "font-size:26px;" + \
         "font-family:Cantarell;" + \
-        "color:rgb(255,255,255);" + \
-        "background-color:rgb(75,75,75);" + \
-        "border-radius:10px;" + \
+        "color:black;" + \
+        "background-color:rgb(200,200,200);" + \
+        "border-radius:0px;" + \
         "}"
 
         return css
@@ -59,7 +63,7 @@ class StyleSheet(object):
         "QLabel {" + \
         "font-size:26px;" + \
         "font-family:Cantarell;" + \
-        "color:rgb(255,255,255);" + \
+        "color:black;" + \
         "background-color:transparent;" + \
         "}"
         
@@ -71,7 +75,7 @@ class StyleSheet(object):
         "QLabel {" + \
         "font-size:26px;" + \
         "font-family:Cantarell;" + \
-        "color:rgb(255,255,255);" + \
+        "color:black;" + \
         "background-color:transparent;" + \
         "}"
 
@@ -83,7 +87,7 @@ class StyleSheet(object):
         "QLabel {" + \
         "font-size:20px;" + \
         "font-family:Cantarell;" + \
-        "color:rgb(255,255,255);" + \
+        "color:black;" + \
         "background-color:transparent;" + \
         "}"
 
@@ -125,23 +129,37 @@ class StyleSheet(object):
 
         return css
 
+    elif ("msgGroupBox" == widget):
+
+        css = \
+        "QGroupBox {" + \
+        "font-size: 22px; font-weight:bold;" + \
+        "color:black;" + \
+        "background-color:transparent;" + \
+        "border:0px solid black;" + \
+        "border-radius:0px;" + \
+        "padding-top:30px;" + \
+        "}"
+
+        return css
+
     elif ("studentMsgSel" == widget):
 
         css = \
         "QPushButton {" + \
         "font-size: 16px; font-weight:bold;" + \
-        "color:rgb(255,255,255);" + \
-        "background-color:rgb(40,40,40);" + \
-        "border:3px solid transparent;" + \
-        "border-radius:10px;" + \
-        "padding:5px;" + \
+        "color:black;" + \
+        "background-color:rgb(200,200,200);" + \
+        "border:0px solid transparent;" + \
+        "border-radius:0px;" + \
+        "padding:10px;" + \
         "}" + \
         "QPushButton::hover {" + \
-        "background-color:rgb(60,60,60);" + \
+        "background-color:white;" + \
         "}" + \
         "QPushButton:checked {" + \
-        "background-color: rgb(60,60,60);" + \
-        "border: 5px solid black; }"
+        "background-color: transparent;" + \
+        "border: 2px solid black; }"
 
         return css
 
@@ -150,11 +168,11 @@ class StyleSheet(object):
 
         css = \
         "QLineEdit {" + \
-        "font-size: 16px; font-weight:bold;" + \
+        "font-size: 20px; font-weight:bold;" + \
         "color:black;" + \
-        "background-color:rgb(150,150,150);" + \
+        "background-color:rgb(200,200,200);" + \
         "border:3px solid transparent;" + \
-        "border-radius:10px;" + \
+        "border-radius:0px;" + \
         "padding:5px;" + \
         "}"
 
@@ -165,12 +183,11 @@ class StyleSheet(object):
 
         css = \
         "QLabel {" + \
-        "font-size: 16px; font-weight:bold;" + \
-        "color:rgb(255,255,255);" + \
+        "font-size: 20px; font-weight:bold;" + \
+        "color:black;" + \
         "background-color:transparent;" + \
         "border:3px solid transparent;" + \
         "border-radius:10px;" + \
-        "padding:0px;" + \
         "}"
 
         return css
