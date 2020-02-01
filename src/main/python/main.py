@@ -112,13 +112,18 @@ class MainWindow(QMainWindow):
     self.sendMsgBtn = QPushButton()
     self.sendMsgBtn.setText("Send Message")
     self.sendMsgBtn.setFixedSize(200*em, 40*em)
-    self.sendMsgBtn.setStyleSheet( StyleSheet.css("button") )
+    self.sendMsgBtn.setStyleSheet( StyleSheet.css("sendMsgBtn") )
     self.sendMsgSpacer = QLabel() # spacer
     self.sendMsgSpacer.setStyleSheet( StyleSheet.css("spacer") )
     self.sendMsgSpacer.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Minimum)
 
     # Conversation Display #
     self.convoText = QTextEdit()
+    self.convoText.setStyleSheet( StyleSheet.css("convoText") )
+
+    # clear convo history button #
+    self.convoClear = QPushButton("clear chat")
+    self.convoClear.setStyleSheet( StyleSheet.css("button") )
 
     # status bar #
     self.status = QStatusBar()
@@ -151,11 +156,17 @@ class MainWindow(QMainWindow):
     DisplayMsgHLayout.setAlignment(Qt.AlignCenter)
     DisplayMsgHLayout.addWidget(self.displayMsg)
 
+    # clear history
+    ClearConvoHLayout = QHBoxLayout()
+    ClearConvoHLayout.setAlignment(Qt.AlignRight)
+    ClearConvoHLayout.addWidget(self.convoClear)
+
     # STUDENT MESSAGING
     #__________________________________________________________________________
 
     # Main Messaging Layout
     MsgCenterVLayout = QVBoxLayout()
+    MsgCenterHLayout = QHBoxLayout()
 
     # Group Box
     self.msgGroupBox = QGroupBox("Student Messaging")
@@ -168,9 +179,9 @@ class MainWindow(QMainWindow):
     StudentMsgSelHLayout2 = QHBoxLayout()
     StudentMsgSelHLayout1.setAlignment(Qt.AlignCenter)
     StudentMsgSelHLayout2.setAlignment(Qt.AlignCenter)
-    for i in range(0,4):
+    for i in range(0,3):
       StudentMsgSelHLayout1.addWidget( self.studentMsgSel[i] )
-    for i in range(4,7):
+    for i in range(3,7):
       StudentMsgSelHLayout2.addWidget( self.studentMsgSel[i] )
 
     # student messaging - SEND
@@ -185,23 +196,22 @@ class MainWindow(QMainWindow):
     MsgCenterVLayout.addLayout(StudentMsgSelHLayout1)
     MsgCenterVLayout.addLayout(StudentMsgSelHLayout2)
     MsgCenterVLayout.addLayout(StudentMsgSendHLayout)
+    MsgCenterHLayout.addWidget(self.msgGroupBox)
+    MsgCenterHLayout.addWidget(self.convoText)
 
     #__________________________________________________________________________
-
-    # bottom info bar
-    BottomHLayout = QHBoxLayout()
-    BottomHLayout.setAlignment(Qt.AlignRight)
 
     # add layouts and widgets
     MainVLayout.addLayout(TopHLayout)
     MainVLayout.addLayout(DisplayMsgHLayout)
-    MainVLayout.addWidget(self.msgGroupBox)
-    MainVLayout.addLayout(BottomHLayout)
+    MainVLayout.addLayout(ClearConvoHLayout)
+    MainVLayout.addLayout(MsgCenterHLayout)
 
     ####################
     #  SIGNAL / SLOTS  #
     ####################
     self.resized.connect(self.SLOT_resized)
+    self.convoClear.clicked.connect(self.SLOT_convoClearClicked)
     self.sendMsgBtn.clicked.connect(self.SLOT_sendMsgBtnClicked)
     self.displayMsg.textChanged.connect(self.SLOT_displayMsgChanged)
     for btn in self.studentMsgSel:
@@ -240,7 +250,6 @@ class MainWindow(QMainWindow):
     clockTimer.timeout.connect(self.updateClock)
     clockTimer.start(10000)
 
-
   # spawn FireRead thread to read data values for all tags stored in Firebase
   # called cyclically by refreshTimer
   def readFirebase(self):
@@ -252,6 +261,7 @@ class MainWindow(QMainWindow):
     self.FireRead.setAvailable.connect(self.SLOT_availabilityChanged)
     self.FireRead.setHours.connect(self.SLOT_hoursChanged)
     self.FireRead.setTeacherName.connect(self.updateTitle)
+    self.FireRead.setTeacherReply.connect(self.SLOT_teacherReply)
     self.FireRead.setDisplayMsg.connect(self.displayMsg.setText)
     self.FireRead.finished.connect(self.SLOT_threadFinished)
 
@@ -282,14 +292,20 @@ class MainWindow(QMainWindow):
 
   # SLOT: send student message button clicked
   def SLOT_sendMsgBtnClicked(self):
-    for btn in self.studentMsgSel:
-      if ( btn.isChecked() ):
-        self.writeFirebase( ["s-name", "s-msg"], [self.studentName.text(), btn.text()] )
-        self.status.showMessage( "Sent message: " + btn.text() )
-        break
+    if( self.studentName.text() ):
+      for btn in self.studentMsgSel:
+        if ( btn.isChecked() ):
+          self.writeFirebase( ["s-name", "s-msg"], [self.studentName.text(), btn.text()] )
+          self.convoText.append( self.clock.text() + "\t" + 
+                                StyleSheet.studentNameHTML + self.studentName.text() + ":"  + "</span> " +
+                                btn.text() )
+          self.status.showMessage( "Sent message: " + btn.text() )
+          break
 
-    for btn in self.studentMsgSel:
-      btn.setChecked(False)
+      for btn in self.studentMsgSel:
+        btn.setChecked(False)
+    else:
+      self.status.showMessage("Failed to send message! Please enter a name.")
 
   # SLOT: student message selection clicked
   def SLOT_studentMsgSelClicked(self):
@@ -298,6 +314,22 @@ class MainWindow(QMainWindow):
         btn.setChecked(False)
     if( not self.sender().isChecked() ):
       self.sender().setChecked(False)
+
+  # SLOT: teach reply received
+  def SLOT_teacherReply(self, reply):
+    self.convoText.append( self.clock.text() + "\t" + 
+                          StyleSheet.teacherNameHTML + self.windowTitle() + ":"  + "</span> " +
+                          reply )
+
+  def SLOT_convoClearClicked(self):
+   msgBox = QMessageBox()
+   msgBox.setText('Are sure you want to clear your chat history?')
+   msgBox.addButton(QPushButton('Yes'), QMessageBox.YesRole)
+   msgBox.addButton(QPushButton('No'), QMessageBox.NoRole)
+   ret = msgBox.exec_()
+
+   if( ret == 0 ):
+    self.convoText.clear()
 
   # SLOT: firebase data retrieval thread finished
   def SLOT_threadFinished(self, newData):

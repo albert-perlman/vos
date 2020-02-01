@@ -8,6 +8,7 @@ class FireRead(QThread):
   # signals slotted to main thread
   finished = pyqtSignal(dict)
   setTeacherName  = pyqtSignal(str)
+  setTeacherReply = pyqtSignal(str)  
   setDisplayMsg   = pyqtSignal(str)
   setAvailable    = pyqtSignal(str)
   setHours        = pyqtSignal(str, str)
@@ -50,7 +51,7 @@ class FireRead(QThread):
       self.newData[tag] = dataVal
 
       # if the data has changed since last read
-      if( dataVal != self.oldData[tag] ):
+      if( dataVal != self.oldData[tag] or tag == "t-reply" ):
 
         if( tag == "t-name" ):
           self.setTeacherName.emit( str(dataVal).strip('"') )
@@ -66,5 +67,11 @@ class FireRead(QThread):
 
         elif( tag == "t-display" ):
           self.setDisplayMsg.emit( str(dataVal).strip('"').replace('\\n','<br/>') )
+        
+        elif( tag == "t-reply" ):
+          reply = str(dataVal).strip('"').replace('\\n','<br/>')
+          if( reply ):
+            self.setTeacherReply.emit( reply )
+          db.patch( "/VOS/", { tag : '\"' + '' + '\"' } )
       
     self.finished.emit(self.newData)

@@ -1,6 +1,10 @@
 # StyleSheet class returns CSS stylesheets for QWidgets
 
 class StyleSheet(object):
+
+  studentNameHTML = "<span style=\" color:#0000FF;\" >"
+  teacherNameHTML = "<span style=\" color:#FF00BB;\" >"
+
   def __init__(self, arg):
     super(StyleSheet, self).__init__()
     self.arg = arg
@@ -15,7 +19,7 @@ class StyleSheet(object):
         "color:rgb(255,255,255);" + \
         "background-color:" + \
         "qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1," + \
-        "stop: 0.0 rgb(175,175,175)" + \
+        "stop: 0.0 rgb(200,200,200)" + \
         "stop: 0.2 rgb(240,240,240)" + \
         "stop: 0.7 rgb(240,240,240)," + \
         "stop: 1.0 rgb(200,200,200));" + \
@@ -24,6 +28,27 @@ class StyleSheet(object):
         return css
 
     elif ("button" == widget):
+
+        css = \
+        "QPushButton {" + \
+        "font-size: 14px; font-weight:bold;" + \
+        "color:black;" + \
+        "background-color:rgb(150,150,150);" + \
+        "border:3px solid transparent;" + \
+        "border-radius:0px;" + \
+        "padding:5px;" + \
+        "}" + \
+        "QPushButton::hover {" + \
+        "background-color:rgb(100,100,100);" + \
+        "}" + \
+        "QPushButton::pressed {" + \
+        "color: white;" + \
+        "background-color:rgb(50,50,50);" + \
+        "}"
+
+        return css
+
+    elif ("sendMsgBtn" == widget):
 
         css = \
         "QPushButton {" + \
@@ -170,7 +195,7 @@ class StyleSheet(object):
         "QLineEdit {" + \
         "font-size: 20px; font-weight:bold;" + \
         "color:black;" + \
-        "background-color:rgb(200,200,200);" + \
+        "background-color:rgb(190,190,190);" + \
         "border:3px solid transparent;" + \
         "border-radius:0px;" + \
         "padding:5px;" + \
@@ -188,6 +213,20 @@ class StyleSheet(object):
         "background-color:transparent;" + \
         "border:3px solid transparent;" + \
         "border-radius:10px;" + \
+        "}"
+
+        return css
+
+    elif ("convoText" == widget):
+
+        css = \
+        "QTextEdit {" + \
+        "font-size: 14px;" + \
+        "color:black;" + \
+        "background-color:transparent;" + \
+        "border-top:1px solid rgb(200,200,200);" + \
+        "border-left:1px solid rgb(200,200,200);" + \
+        "border-radius:0px;" + \
         "}"
 
         return css
