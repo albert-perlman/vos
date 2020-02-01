@@ -33,13 +33,13 @@ class StyleSheet(object):
         "QPushButton {" + \
         "font-size: 14px; font-weight:bold;" + \
         "color:black;" + \
-        "background-color:rgb(150,150,150);" + \
-        "border:3px solid transparent;" + \
+        "background-color:transparent;" + \
+        "border:2px solid black;" + \
         "border-radius:0px;" + \
         "padding:5px;" + \
         "}" + \
         "QPushButton::hover {" + \
-        "background-color:rgb(100,100,100);" + \
+        "background-color:white;" + \
         "}" + \
         "QPushButton::pressed {" + \
         "color: white;" + \
@@ -54,13 +54,13 @@ class StyleSheet(object):
         "QPushButton {" + \
         "font-size: 20px; font-weight:bold;" + \
         "color:black;" + \
-        "background-color:rgb(150,150,150);" + \
-        "border:3px solid transparent;" + \
+        "background-color:transparent;" + \
+        "border:2px solid black;" + \
         "border-radius:0px;" + \
         "padding:5px;" + \
         "}" + \
         "QPushButton::hover {" + \
-        "background-color:rgb(100,100,100);" + \
+        "background-color:white;" + \
         "}" + \
         "QPushButton::pressed {" + \
         "color: white;" + \

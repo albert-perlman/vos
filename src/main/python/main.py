@@ -47,7 +47,7 @@ class MainWindow(QMainWindow):
     # clock #
     self.clock = QLabel( time.strftime("%H"+":"+"%M") )
     self.clock.setAlignment(Qt.AlignRight)
-    self.clock.setFixedSize(200*em, 50*em)
+    self.clock.setFixedSize(250*em, 50*em)
     self.clock.setStyleSheet( StyleSheet.css("clock") )
     self.clockSpacer = QLabel() # spacer
     self.clockSpacer.setStyleSheet( StyleSheet.css("spacer") )
@@ -221,6 +221,7 @@ class MainWindow(QMainWindow):
     #     START-UP     #
     ####################
     self.updateTitle()
+    self.updateClock()
     self.show()
 
     # initialize dictionary to store Firebase data
@@ -288,7 +289,30 @@ class MainWindow(QMainWindow):
 
   # SLOT: teacher office hours changed
   def SLOT_hoursChanged(self, startTime, endTime):
-    self.hours.setText( startTime + " - " + endTime )
+    startTime = startTime.split(':')
+    endTime = endTime.split(':')
+    try:
+      hourStart = int(startTime[0])
+      hourEnd = int(endTime[0])
+    except:
+      pass
+    am_pmStart= "am"
+    am_pmEnd = "am"
+    
+    # start hours
+    if( hourStart > 12 ):
+      startTime[0] = str( hourStart - 12 )
+    if( hourStart >= 12 ):
+      am_pmStart = "pm"
+
+    # end hours
+    if( hourEnd > 12 ):
+      endTime[0] = str( hourEnd - 12 )
+    if( hourEnd >= 12 ):
+      am_pmEnd = "pm"
+
+    self.hours.setText( startTime[0] + ":" + startTime[1] + am_pmStart + " - " +
+                        endTime[0] + ":" + endTime[1] + am_pmEnd )
 
   # SLOT: send student message button clicked
   def SLOT_sendMsgBtnClicked(self):
@@ -315,12 +339,13 @@ class MainWindow(QMainWindow):
     if( not self.sender().isChecked() ):
       self.sender().setChecked(False)
 
-  # SLOT: teach reply received
+  # SLOT: teacher reply received
   def SLOT_teacherReply(self, reply):
     self.convoText.append( self.clock.text() + "\t" + 
                           StyleSheet.teacherNameHTML + self.windowTitle() + ":"  + "</span> " +
                           reply )
 
+  # SLOT: clear chat button clicked
   def SLOT_convoClearClicked(self):
    msgBox = QMessageBox()
    msgBox.setText('Are sure you want to clear your chat history?')
@@ -366,7 +391,15 @@ class MainWindow(QMainWindow):
 
   # update clock display
   def updateClock(self):
-    self.clock.setText( time.strftime("%H"+":"+"%M") )
+    currentTime = time.strftime("%H"+":"+"%M").split(':')
+    hour = int(currentTime[0])
+    am_pm = "am"
+    if( hour > 12 ):
+      currentTime[0] = str( hour - 12 )
+    if( hour >= 12 ):
+      am_pm = "pm"
+    
+    self.clock.setText( currentTime[0] + ":" + currentTime[1] + am_pm )
 
   # map key press events to gallery navigation
   def keyPressEvent(self, event):
