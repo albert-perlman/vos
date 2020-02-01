@@ -60,10 +60,12 @@ class FireRead(QThread):
           self.setAvailable.emit( dataVal )
 
         elif( tag == "t-hours-start" ):
-          self.setHours.emit( str(dataVal).strip('"'), self.oldData["t-hours-end"].strip('"') )
+          endTime = db.get( '/VOS/' + "t-hours-end", None )
+          self.setHours.emit( str(dataVal).strip('"'), str(endTime).strip('"') )
 
         elif( tag == "t-hours-end" ):
-          self.setHours.emit( self.newData["t-hours-start"].strip('"'), str(dataVal).strip('"') )
+          startTime = db.get( '/VOS/' + "t-hours-start", None )
+          self.setHours.emit( str(startTime).strip('"'), str(dataVal).strip('"') )
 
         elif( tag == "t-display" ):
           self.setDisplayMsg.emit( str(dataVal).strip('"').replace('\\n','<br/>') )

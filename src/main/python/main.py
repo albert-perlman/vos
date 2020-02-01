@@ -278,6 +278,19 @@ class MainWindow(QMainWindow):
     # run Firebase thread
     self.FireWrite.start()
 
+  # re-format 24-hour time string (e.g. 13:00) to 12-hour time (e.g. 1:00pm)
+  def formatTime(self, t):
+    t = t.split(':')
+    hour = int(t[0])
+    am_pm = "am"
+    
+    if( hour > 12 ):
+      t[0] = str( hour - 12 )
+    if( hour >= 12 ):
+      am_pm= "pm"
+
+    return( t[0] + ":" + t[1] + am_pm )
+
   # SLOT: teacher availability changed
   def SLOT_availabilityChanged(self, availability):
     if( "true" == availability ):
@@ -289,30 +302,10 @@ class MainWindow(QMainWindow):
 
   # SLOT: teacher office hours changed
   def SLOT_hoursChanged(self, startTime, endTime):
-    startTime = startTime.split(':')
-    endTime = endTime.split(':')
-    try:
-      hourStart = int(startTime[0])
-      hourEnd = int(endTime[0])
-    except:
-      pass
-    am_pmStart= "am"
-    am_pmEnd = "am"
-    
-    # start hours
-    if( hourStart > 12 ):
-      startTime[0] = str( hourStart - 12 )
-    if( hourStart >= 12 ):
-      am_pmStart = "pm"
+    startTime = self.formatTime(startTime)
+    endTime = self.formatTime(endTime)
 
-    # end hours
-    if( hourEnd > 12 ):
-      endTime[0] = str( hourEnd - 12 )
-    if( hourEnd >= 12 ):
-      am_pmEnd = "pm"
-
-    self.hours.setText( startTime[0] + ":" + startTime[1] + am_pmStart + " - " +
-                        endTime[0] + ":" + endTime[1] + am_pmEnd )
+    self.hours.setText( startTime + " - " + endTime )
 
   # SLOT: send student message button clicked
   def SLOT_sendMsgBtnClicked(self):
