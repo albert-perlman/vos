@@ -71,6 +71,13 @@ class MainWindow(QMainWindow):
     self.available.setAlignment(Qt.AlignCenter)
     self.available.setStyleSheet( StyleSheet.css("unavailable") )
 
+    # S&T Logo #
+    self.logoLabel = QLabel()
+    pixmap = QPixmap( self.appctxt.get_resource('images/MissouriS&T_Horizontal_DigitalMinerGreen.png') )
+    image = pixmap.scaled(400*em, 50*em, Qt.KeepAspectRatio, Qt.FastTransformation)
+    self.logoLabel.setPixmap(image)
+
+
     # Display Message #
     self.displayMsg = QTextEdit()
     self.displayMsg.setFixedSize(800*em, 90*em)
@@ -158,6 +165,11 @@ class MainWindow(QMainWindow):
     DisplayMsgHLayout.setAlignment(Qt.AlignCenter)
     DisplayMsgHLayout.addWidget(self.displayMsg)
 
+    # S&T logo
+    LogoHLayout = QHBoxLayout()
+    LogoHLayout.addWidget(self.logoLabel)
+    LogoHLayout.setAlignment(Qt.AlignCenter)
+
     # clear history
     ClearConvoHLayout = QHBoxLayout()
     ClearConvoHLayout.setAlignment(Qt.AlignRight)
@@ -206,6 +218,7 @@ class MainWindow(QMainWindow):
     # add layouts and widgets
     MainVLayout.addLayout(TopHLayout)
     MainVLayout.addLayout(DisplayMsgHLayout)
+    MainVLayout.addLayout(LogoHLayout)
     MainVLayout.addLayout(ClearConvoHLayout)
     MainVLayout.addLayout(MsgCenterHLayout)
 

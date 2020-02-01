@@ -89,7 +89,7 @@ class StyleSheet(object):
 
         css = \
         "QLabel {" + \
-        "font-size:22px;" + \
+        "font-size:24px;" + \
         "color:black;" + \
         "background-color:transparent;" + \
         "}"
