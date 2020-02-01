@@ -27,7 +27,8 @@ class MainWindow(QMainWindow):
 
     # Main Widget Container
     MainWidgetContainer = QWidget()
-    QFontDatabase.addApplicationFont(self.appctxt.get_resource('fonts/Cantarell-Regular.ttf'))
+    QFontDatabase.addApplicationFont(self.appctxt.get_resource('fonts/Montserrat-Bold.ttf'))
+    QFontDatabase.addApplicationFont(self.appctxt.get_resource('fonts/Montserrat-Regular.ttf'))
     MainWidgetContainer.setStyleSheet(StyleSheet.css("window"))
     self.setCentralWidget(MainWidgetContainer)
 
@@ -119,6 +120,7 @@ class MainWindow(QMainWindow):
 
     # Conversation Display #
     self.convoText = QTextEdit()
+    self.convoText.setReadOnly(True)
     self.convoText.setStyleSheet( StyleSheet.css("convoText") )
 
     # clear convo history button #
@@ -313,9 +315,10 @@ class MainWindow(QMainWindow):
       for btn in self.studentMsgSel:
         if ( btn.isChecked() ):
           self.writeFirebase( ["s-name", "s-msg"], [self.studentName.text(), btn.text()] )
-          self.convoText.append( self.clock.text() + "\t" + 
-                                StyleSheet.studentNameHTML + self.studentName.text() + ":"  + "</span> " +
-                                btn.text() )
+          self.convoText.append( StyleSheet.msgHTML +
+                                 StyleSheet.timestampHTML + self.clock.text() + "\t" + "</span>" +
+                                 StyleSheet.studentNameHTML + self.studentName.text() + ":"  + "</span> " +
+                                 btn.text() + "</p>")
           self.status.showMessage( "Sent message: " + btn.text() )
           break
 
@@ -334,9 +337,10 @@ class MainWindow(QMainWindow):
 
   # SLOT: teacher reply received
   def SLOT_teacherReply(self, reply):
-    self.convoText.append( self.clock.text() + "\t" + 
-                          StyleSheet.teacherNameHTML + self.windowTitle() + ":"  + "</span> " +
-                          reply )
+    self.convoText.append( StyleSheet.msgHTML + 
+                           StyleSheet.timestampHTML + self.clock.text() + "\t" + "</span>" +
+                           StyleSheet.teacherNameHTML + self.windowTitle() + ":"  + "</span> " +
+                           reply + "</p>" )
 
   # SLOT: clear chat button clicked
   def SLOT_convoClearClicked(self):
