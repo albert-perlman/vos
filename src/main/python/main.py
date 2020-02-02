@@ -18,9 +18,13 @@ from PyStyle import StyleSheet
 import FireRead
 import FireWrite
 
+# Twilio
+TWILIO_NUMBER = os.environ['TWILIO_NUMBER']
+TWILIO_RECVR  = os.environ['TWILIO_RECVR']
+ACCOUNT_SID   = os.environ['TWILIO_ACCOUNT_SID']
+AUTH_TOKEN    = os.environ['TWILIO_AUTH_TOKEN']
+
 em = 1
-TWILIO_NUMBER = "+12017332190"
-TWILIO_RECVR = "+12178912451"
 
 class MainWindow(QMainWindow):
   resized = pyqtSignal()
@@ -30,8 +34,8 @@ class MainWindow(QMainWindow):
 
     self.appctxt = ApplicationContext()
 
-    # Twilio Client( Account SID, Auth Token)
-    self.twilio = Client("ACc77e25477f3211e93fe4c5cfa97b911e", "436ea9116c30d5f4c9a5c90f77b5c3b3")
+    # initialize Twilio Client
+    self.twilio = Client( ACCOUNT_SID, AUTH_TOKEN )
 
     # Main Widget Container
     MainWidgetContainer = QWidget()
