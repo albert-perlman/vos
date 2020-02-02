@@ -19,7 +19,7 @@ class StyleSheet(object):
         "QWidget {" + \
         "font-family:Montserrat;" + \
         "color:rgb(255,255,255);" + \
-        "background-color:rgb(240,240,240);" + \
+        "background-color:rgb(230,230,230);" + \
         "}" + \
         "QScrollBar:vertical {" + \
         "background:rgb(200,200,200);" + \

@@ -1,10 +1,13 @@
 from fbs_runtime.application_context.PyQt5 import ApplicationContext
 
+from twilio.rest import Client
+
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
 from PyQt5.QtPrintSupport import *
 from PyQt5.QtMultimedia  import *
+from PyQt5.QtWebEngineWidgets import *
 
 import os
 import sys
@@ -16,6 +19,8 @@ import FireRead
 import FireWrite
 
 em = 1
+TWILIO_NUMBER = "+12017332190"
+TWILIO_RECVR = "+12178912451"
 
 class MainWindow(QMainWindow):
   resized = pyqtSignal()
@@ -24,6 +29,9 @@ class MainWindow(QMainWindow):
     super(MainWindow, self).__init__(*args, **kwargs)
 
     self.appctxt = ApplicationContext()
+
+    # Twilio Client( Account SID, Auth Token)
+    self.twilio = Client("ACc77e25477f3211e93fe4c5cfa97b911e", "436ea9116c30d5f4c9a5c90f77b5c3b3")
 
     # Main Widget Container
     MainWidgetContainer = QWidget()
@@ -76,7 +84,6 @@ class MainWindow(QMainWindow):
     pixmap = QPixmap( self.appctxt.get_resource('images/MissouriS&T_Horizontal_DigitalMinerGreen.png') )
     image = pixmap.scaled(400*em, 50*em, Qt.KeepAspectRatio, Qt.FastTransformation)
     self.logoLabel.setPixmap(image)
-
 
     # Display Message #
     self.displayMsg = QTextEdit()
@@ -293,6 +300,12 @@ class MainWindow(QMainWindow):
     # run Firebase thread
     self.FireWrite.start()
 
+  # send SMS message from Twilio
+  def sendSMS(self, msg):
+    self.twilio.messages.create( to=TWILIO_RECVR,
+                                 from_=TWILIO_NUMBER, 
+                                 body=msg )
+
   # re-format 24-hour time string (e.g. 13:00) to 12-hour time (e.g. 1:00pm)
   def formatTime(self, t):
     t = t.split(':')
@@ -327,6 +340,7 @@ class MainWindow(QMainWindow):
     if( self.studentName.text() ):
       for btn in self.studentMsgSel:
         if ( btn.isChecked() ):
+          self.sendSMS( self.studentName.text() + ": " + btn.text() )
           self.writeFirebase( ["s-name", "s-msg"], [self.studentName.text(), btn.text()] )
           self.convoText.append( StyleSheet.msgHTML +
                                  StyleSheet.timestampHTML + self.clock.text() + "\t" + "</span>" +
