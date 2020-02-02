@@ -56,11 +56,13 @@ class MainWindow(QMainWindow):
     # clock #
     self.clock = QLabel( time.strftime("%H"+":"+"%M") )
     self.clock.setAlignment(Qt.AlignRight)
-    self.clock.setFixedSize(250*em, 50*em)
+    self.clock.setFixedHeight(50*em)
     self.clock.setStyleSheet( StyleSheet.css("clock") )
-    self.clockSpacer = QLabel() # spacer
-    self.clockSpacer.setStyleSheet( StyleSheet.css("spacer") )
-    self.clockSpacer.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Minimum)
+
+     # S&T Connect Browser #
+    self.webBtn = QPushButton("Schedule an appointment")
+    self.webBtn.setFixedHeight(50*em)
+    self.webBtn.setStyleSheet( StyleSheet.css("webBtn") )
 
     # Office Hours #
     self.hours = QLabel("12:00 - 12:00")
@@ -79,12 +81,6 @@ class MainWindow(QMainWindow):
     self.available.setAlignment(Qt.AlignCenter)
     self.available.setStyleSheet( StyleSheet.css("unavailable") )
 
-    # S&T Logo #
-    self.logoLabel = QLabel()
-    pixmap = QPixmap( self.appctxt.get_resource('images/MissouriS&T_Horizontal_DigitalMinerGreen.png') )
-    image = pixmap.scaled(400*em, 50*em, Qt.KeepAspectRatio, Qt.FastTransformation)
-    self.logoLabel.setPixmap(image)
-
     # Display Message #
     self.displayMsg = QTextEdit()
     self.displayMsg.setFixedSize(800*em, 90*em)
@@ -92,6 +88,12 @@ class MainWindow(QMainWindow):
     self.displayMsg.setReadOnly(True)
     self.displayMsg.setAlignment(Qt.AlignCenter)
     self.displayMsg.setStyleSheet( StyleSheet.css("displayMsg") )
+
+     # S&T Logo #
+    self.logoLabel = QLabel()
+    pixmap = QPixmap( self.appctxt.get_resource('images/MissouriS&T_Horizontal_DigitalMinerGreen.png') )
+    image = pixmap.scaled(400*em, 50*em, Qt.KeepAspectRatio, Qt.FastTransformation)
+    self.logoLabel.setPixmap(image)
 
     # Student Message Selections #
     self.studentMsgList = [
@@ -164,7 +166,7 @@ class MainWindow(QMainWindow):
     TopHLayout.addLayout(HoursVLayout)
     TopHLayout.addWidget(self.hoursSpacer)
     TopHLayout.addWidget(self.available)
-    TopHLayout.addWidget(self.clockSpacer)
+    TopHLayout.addWidget(self.webBtn)
     TopHLayout.addWidget(self.clock)
 
     # display message
@@ -174,8 +176,8 @@ class MainWindow(QMainWindow):
 
     # S&T logo
     LogoHLayout = QHBoxLayout()
-    LogoHLayout.addWidget(self.logoLabel)
     LogoHLayout.setAlignment(Qt.AlignCenter)
+    LogoHLayout.addWidget(self.logoLabel)
 
     # clear history
     ClearConvoHLayout = QHBoxLayout()
@@ -233,6 +235,7 @@ class MainWindow(QMainWindow):
     #  SIGNAL / SLOTS  #
     ####################
     self.resized.connect(self.SLOT_resized)
+    self.webBtn.clicked.connect(self.SLOT_webBtnClicked)
     self.convoClear.clicked.connect(self.SLOT_convoClearClicked)
     self.sendMsgBtn.clicked.connect(self.SLOT_sendMsgBtnClicked)
     self.displayMsg.textChanged.connect(self.SLOT_displayMsgChanged)
@@ -334,6 +337,12 @@ class MainWindow(QMainWindow):
     endTime = self.formatTime(endTime)
 
     self.hours.setText( startTime + " - " + endTime )
+
+  # SLOT: schedule appointment button clicked - open browser to S&T Connect
+  def SLOT_webBtnClicked(self):
+    self.web = QWebEngineView()
+    self.web.load( QUrl("https://mst.starfishsolutions.com/starfish-ops/instructor/serviceCatalog.html?tenantId=594#/") )
+    self.web.show()
 
   # SLOT: send student message button clicked
   def SLOT_sendMsgBtnClicked(self):

@@ -46,7 +46,7 @@ class StyleSheet(object):
         "}" + \
         "QPushButton::pressed {" + \
         "color: white;" + \
-        "background-color:rgb(50,50,50);" + \
+        "background-color:rgb(75,75,75);" + \
         "}"
 
         return css
@@ -55,10 +55,11 @@ class StyleSheet(object):
 
         css = \
         "QTextEdit {" + \
-        "font-size:26px;" + \
+        "font-size:32px;" + \
         "color:black;" + \
-        "background-color:rgb(200,200,200);" + \
-        "border-radius:0px;" + \
+        "background-color:rgb(220,220,220);" + \
+        "border: 1px solid black;" + \
+        "border-radius:40px;" + \
         "}"
 
         return css
@@ -118,6 +119,29 @@ class StyleSheet(object):
         "background-color:rgb(255,150,150);" + \
         "border: 1px solid black;" + \
         "border-radius:20px;" + \
+        "}"
+
+        return css
+
+    elif ("webBtn" == widget):
+
+        css = \
+        "QPushButton {" + \
+        "font-size: 14px;" + \
+        "color:black;" + \
+        "background-color:transparent;" + \
+        "border:1px solid black;" + \
+        "border-radius:0px;" + \
+        "padding:10px;" + \
+        "margin-left:25px;" + \
+        "margin-right:20px;" + \
+        "}" + \
+        "QPushButton::hover {" + \
+        "background-color:white;" + \
+        "}" + \
+        "QPushButton::pressed {" + \
+        "color: white;" + \
+        "background-color:rgb(75,75,75);" + \
         "}"
 
         return css
