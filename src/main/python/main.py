@@ -33,7 +33,14 @@ class MainWindow(QMainWindow):
     super(MainWindow, self).__init__(*args, **kwargs)
 
     self.appctxt = ApplicationContext()
-    self.setWindowFlag(Qt.WindowCloseButtonHint, False)
+
+    # remove Minimize, Maximize, and Close buttons from application window
+    self.setWindowFlags(self.windowFlags() | Qt.CustomizeWindowHint)
+    self.setWindowFlags( self.windowFlags() &
+                         ~Qt.WindowMaximizeButtonHint & 
+                         ~Qt.WindowMinimizeButtonHint &
+                         ~Qt.WindowCloseButtonHint )
+
 
     # initialize Twilio Client
     self.twilio = Client( ACCOUNT_SID, AUTH_TOKEN )
