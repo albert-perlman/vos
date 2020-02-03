@@ -65,7 +65,7 @@ class MainWindow(QMainWindow):
     self.clock.setStyleSheet( StyleSheet.css("clock") )
 
      # S&T Connect Browser #
-    self.webBtn = QPushButton("Schedule an appointment")
+    self.webBtn = QPushButton("Schedule Appointment")
     self.webBtn.setFixedHeight(50*em)
     self.webBtn.setStyleSheet( StyleSheet.css("webBtn") )
 
@@ -97,7 +97,7 @@ class MainWindow(QMainWindow):
      # S&T Logo #
     self.logoLabel = QLabel()
     pixmap = QPixmap( self.appctxt.get_resource('images/MissouriS&T_Horizontal_DigitalMinerGreen.png') )
-    image = pixmap.scaled(400*em, 50*em, Qt.KeepAspectRatio, Qt.FastTransformation)
+    image = pixmap.scaled(400*em, 60*em, Qt.KeepAspectRatio, Qt.FastTransformation)
     self.logoLabel.setPixmap(image)
 
     # Student Message Selections #
@@ -348,6 +348,9 @@ class MainWindow(QMainWindow):
     self.web = QWebEngineView()
     self.web.page().profile().cookieStore().deleteAllCookies()
     self.web.setUrl( QUrl("https://mst.starfishsolutions.com/starfish-ops/instructor/serviceCatalog.html?tenantId=594#/") )
+    self.web.setFixedSize(1024*em, 600*em)
+    self.web.setWindowFlag(Qt.WindowMaximizeButtonHint, False)
+    self.web.setWindowFlag(Qt.WindowMinimizeButtonHint, False)
     self.web.show()
 
   # SLOT: send student message button clicked

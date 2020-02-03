@@ -127,14 +127,14 @@ class StyleSheet(object):
 
         css = \
         "QPushButton {" + \
-        "font-size: 14px;" + \
+        "font-size: 15px;" + \
         "color:black;" + \
         "background-color:transparent;" + \
         "border:1px solid black;" + \
         "border-radius:0px;" + \
         "padding:10px;" + \
-        "margin-left:25px;" + \
-        "margin-right:20px;" + \
+        "margin-left:30px;" + \
+        "margin-right:30px;" + \
         "}" + \
         "QPushButton::hover {" + \
         "background-color:white;" + \
@@ -155,7 +155,7 @@ class StyleSheet(object):
         "background-color:transparent;" + \
         "border:0px solid black;" + \
         "border-radius:0px;" + \
-        "padding-top:30px;" + \
+        "padding-top:40px;" + \
         "}"
 
         return css
