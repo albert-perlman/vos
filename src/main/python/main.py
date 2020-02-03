@@ -33,6 +33,7 @@ class MainWindow(QMainWindow):
     super(MainWindow, self).__init__(*args, **kwargs)
 
     self.appctxt = ApplicationContext()
+    self.setWindowFlag(Qt.WindowCloseButtonHint, False)
 
     # initialize Twilio Client
     self.twilio = Client( ACCOUNT_SID, AUTH_TOKEN )
