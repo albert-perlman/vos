@@ -346,7 +346,8 @@ class MainWindow(QMainWindow):
   # SLOT: schedule appointment button clicked - open browser to S&T Connect
   def SLOT_webBtnClicked(self):
     self.web = QWebEngineView()
-    self.web.load( QUrl("https://mst.starfishsolutions.com/starfish-ops/instructor/serviceCatalog.html?tenantId=594#/") )
+    self.web.page().profile().cookieStore().deleteAllCookies()
+    self.web.setUrl( QUrl("https://mst.starfishsolutions.com/starfish-ops/instructor/serviceCatalog.html?tenantId=594#/") )
     self.web.show()
 
   # SLOT: send student message button clicked
