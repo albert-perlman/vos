@@ -18,7 +18,7 @@ class StyleSheet(object):
         css = \
         "QWidget {" + \
         "font-family:Montserrat;" + \
-        "color:rgb(255,255,255);" + \
+        "color:black;" + \
         "background-color:rgb(230,230,230);" + \
         "}" + \
         "QScrollBar:vertical {" + \
@@ -60,6 +60,8 @@ class StyleSheet(object):
         "background-color:rgb(220,220,220);" + \
         "border: 1px solid black;" + \
         "border-radius:40px;" + \
+        "margin-top:10px;" + \
+        "margin-bottom:0px;" + \
         "}"
 
         return css
@@ -119,6 +121,16 @@ class StyleSheet(object):
         "background-color:rgb(255,150,150);" + \
         "border: 1px solid black;" + \
         "border-radius:20px;" + \
+        "}"
+
+        return css
+
+    elif ("qrLabel" == widget):
+        
+        css = \
+        "QLabel {" + \
+        "font-size:18px;" + \
+        "color:black;" + \
         "}"
 
         return css
