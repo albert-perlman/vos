@@ -77,6 +77,17 @@ class StyleSheet(object):
         
         return css
 
+    elif ("date" == widget):
+
+        css = \
+        "QLabel {" + \
+        "font-size:18px;" + \
+        "color:black;" + \
+        "background-color:transparent;" + \
+        "}"
+
+        return css
+
     elif ("hours" == widget):
 
         css = \

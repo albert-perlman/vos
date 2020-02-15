@@ -1,20 +1,23 @@
-from twilio.rest import Client
+import os
+import sys
+import time
+import datetime
 
+# PyQt5
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
 from PyQt5.QtPrintSupport import *
 
-import os
-import sys
-import time
-
+# CSS
 from PyStyle import StyleSheet
 
+# Firebase
 import FireRead
 import FireWrite
 
 # Twilio
+from twilio.rest import Client
 TWILIO_NUMBER = os.environ['TWILIO_NUMBER']
 TWILIO_RECVR  = os.environ['TWILIO_RECVR']
 ACCOUNT_SID   = os.environ['TWILIO_ACCOUNT_SID']
@@ -67,6 +70,12 @@ class MainWindow(QMainWindow):
     self.clockSpacer = QLabel() # spacer
     self.clockSpacer.setStyleSheet( StyleSheet.css("spacer") )
     self.clockSpacer.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Minimum)
+
+    # date
+    self.date = QLabel( datetime.datetime.now().strftime("%A, "+"%b. "+"%d") )
+    self.date.setAlignment(Qt.AlignRight)
+    self.date.setFixedWidth(300*em)
+    self.date.setStyleSheet( StyleSheet.css("date") )
 
     # S&T Connect Browser #
     # self.webBtn = QPushButton("Schedule Appointment")
@@ -195,6 +204,11 @@ class MainWindow(QMainWindow):
     HoursVLayout.addWidget(self.hours)
     HoursVLayout.addWidget(self.hoursLabel)
 
+    # clock / date
+    ClockVLayout = QVBoxLayout()
+    ClockVLayout.addWidget(self.clock)
+    ClockVLayout.addWidget(self.date)
+
     # top info bar
     TopHLayout = QHBoxLayout()
     TopHLayout.setAlignment(Qt.AlignCenter)
@@ -203,7 +217,7 @@ class MainWindow(QMainWindow):
     TopHLayout.addWidget(self.available)
     # TopHLayout.addWidget(self.webBtn)
     TopHLayout.addWidget(self.clockSpacer)
-    TopHLayout.addWidget(self.clock)
+    TopHLayout.addLayout(ClockVLayout)
 
     #__________________________________________________________________________
 
@@ -473,6 +487,11 @@ class MainWindow(QMainWindow):
       am_pm = "pm"
     
     self.clock.setText( currentTime[0] + ":" + currentTime[1] + am_pm )
+    self.updateDate()
+
+  # update date display
+  def updateDate(self):
+    self.date.setText( datetime.datetime.now().strftime("%A, "+"%b. "+"%d") )
 
   # map key press events to gallery navigation
   def keyPressEvent(self, event):
