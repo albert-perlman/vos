@@ -425,6 +425,7 @@ class MainWindow(QMainWindow):
 
   # SLOT: teacher reply received
   def SLOT_teacherReply(self, reply):
+    self.sendSMS( self.windowTitle() + ": " + reply )
     self.convoText.append( StyleSheet.msgHTML + 
                            StyleSheet.timestampHTML + self.clock.text() + "\t" + "</span>" +
                            StyleSheet.teacherNameHTML + self.windowTitle() + ":"  + "</span> " +
