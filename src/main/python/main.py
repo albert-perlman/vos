@@ -95,7 +95,7 @@ class MainWindow(QMainWindow):
     self.qrBLabel = QLabel("Schedule Appointment", self)
     self.qrBLabel.setFixedWidth(200*em)
     self.qrTLabel.move(715,-6)
-    self.qrBLabel.move(665,95)
+    self.qrBLabel.move(665,96)
     self.qrTLabel.setAlignment(Qt.AlignCenter)
     self.qrBLabel.setAlignment(Qt.AlignCenter)
     self.qrTLabel.setStyleSheet(StyleSheet.css("qrLabel"))
@@ -126,6 +126,11 @@ class MainWindow(QMainWindow):
     self.displayMsg.setReadOnly(True)
     self.displayMsg.setAlignment(Qt.AlignCenter)
     self.displayMsg.setStyleSheet( StyleSheet.css("displayMsg") )
+    # last modified label
+    self.displayMsgUpdate = QLabel(self)
+    self.displayMsgUpdate.setFixedWidth(200*em)
+    self.displayMsgUpdate.move(160,120)
+    self.displayMsgUpdate.setStyleSheet(StyleSheet.css("displayMsgUpdate"))
 
      # S&T Logo #
     self.logoLabel = QLabel(self)
@@ -312,16 +317,16 @@ class MainWindow(QMainWindow):
     self.readFirebase()
 
     # refresh data timer
-    # repeats infinitely to trigger data retrieval from Firebase
+    # restarts every time FireRead thread finishes
     self.refreshTimer = QTimer(self)
     self.refreshTimer.setSingleShot(True)
     self.refreshTimer.timeout.connect(self.readFirebase)
 
     # clock timer
-    # repeats infinitely to trigger clock updates every 10 seconds
+    # repeats infinitely to trigger clock updates every 5 seconds
     clockTimer = QTimer(self)
     clockTimer.timeout.connect(self.updateClock)
-    clockTimer.start(10000)
+    clockTimer.start(5000)
 
   # spawn FireRead thread to read data values for all tags stored in Firebase
   # called cyclically by refreshTimer
@@ -451,6 +456,7 @@ class MainWindow(QMainWindow):
   # SLOT: Display Message changed - reset text alignment
   def SLOT_displayMsgChanged(self):
     try:
+      self.displayMsgUpdate.setText("updated " + datetime.datetime.now().strftime("%b. "+"%d at "+ self.clock.text() ) )
       self.displayMsg.setAlignment(Qt.AlignCenter)
     except:
       pass

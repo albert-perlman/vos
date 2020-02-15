@@ -51,20 +51,6 @@ class StyleSheet(object):
 
         return css
 
-    elif ("displayMsg" == widget):
-
-        css = \
-        "QTextEdit {" + \
-        "font-size:32px;" + \
-        "color:black;" + \
-        "background-color:rgb(220,220,220);" + \
-        "border: 1px solid black;" + \
-        "border-radius:40px;" + \
-        "margin-top:10px;" + \
-        "margin-bottom:0px;" + \
-        "}"
-
-        return css
 
     elif ("clock" == widget):
 
@@ -165,6 +151,33 @@ class StyleSheet(object):
         "QPushButton::pressed {" + \
         "color: white;" + \
         "background-color:rgb(75,75,75);" + \
+        "}"
+
+        return css
+
+
+    elif ("displayMsg" == widget):
+
+        css = \
+        "QTextEdit {" + \
+        "font-size:32px;" + \
+        "color:black;" + \
+        "background-color:rgb(220,220,220);" + \
+        "border: 1px solid black;" + \
+        "border-radius:40px;" + \
+        "margin-top:10px;" + \
+        "margin-bottom:0px;" + \
+        "}"
+
+        return css
+
+    elif ("displayMsgUpdate" == widget):
+
+        css = \
+        "QLabel {" + \
+        "font-size:16px;" + \
+        "color:black;" + \
+        "background-color:transparent;" + \
         "}"
 
         return css
