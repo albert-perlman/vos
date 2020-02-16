@@ -2,6 +2,7 @@ import os
 import sys
 import time
 import datetime
+import subprocess
 
 # PyQt5
 from PyQt5.QtGui import *
@@ -162,7 +163,7 @@ class MainWindow(QMainWindow):
         btn.setFixedWidth(100*em)
 
     # Student Name #
-    self.studentName = QLineEdit()
+    self.studentName = LineEdit()
     self.studentNameLabel = QLabel("Name")
     self.studentNameLabel.setAlignment(Qt.AlignRight)
     self.studentName.setFixedSize(241*em, 40*em)
@@ -289,6 +290,8 @@ class MainWindow(QMainWindow):
     self.resized.connect(self.SLOT_resized)
     # self.webBtn.clicked.connect(self.SLOT_webBtnClicked)
     self.convoClear.clicked.connect(self.SLOT_convoClearClicked)
+    self.studentName.focusIn.connect(self.SLOT_nameFocusIn)
+    self.studentName.focusOut.connect(self.SLOT_nameFocusOut)
     self.sendMsgBtn.clicked.connect(self.SLOT_sendMsgBtnClicked)
     self.displayMsg.textChanged.connect(self.SLOT_displayMsgChanged)
     for btn in self.studentMsgSel:
@@ -400,6 +403,15 @@ class MainWindow(QMainWindow):
     # self.web.setWindowFlag(Qt.WindowMaximizeButtonHint, False)
     # self.web.setWindowFlag(Qt.WindowMinimizeButtonHint, False)
     # self.web.show()
+
+  # SLOT: student name line edit focused - open keyboard
+  def SLOT_nameFocusIn(self):
+    self.keyboard = subprocess.Popen('matchbox-keyboard', stdout=subprocess.PIPE)
+    self.studentName.setFocus()
+
+  # SLOT: student name line edit lost focus - close keyboard
+  def SLOT_nameFocusOut(self):
+    self.keyboard.kill()
 
   # SLOT: send student message button clicked
   def SLOT_sendMsgBtnClicked(self):
@@ -539,6 +551,15 @@ class MainWindow(QMainWindow):
   def resizeEvent(self, event):
     self.resized.emit()
     return super(MainWindow, self).resizeEvent(event)
+
+# overide QLineEdit Focus Events to emit signals
+class LineEdit(QLineEdit):
+  focusIn = pyqtSignal()
+  focusOut = pyqtSignal()
+  def focusInEvent(self, event):
+    self.focusIn.emit()
+  def focusOutEvent(self, event):
+    self.focusOut.emit()
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
