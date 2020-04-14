@@ -1,24 +1,24 @@
-from fbs_runtime.application_context.PyQt5 import ApplicationContext
+import os
+import sys
+import time
+import datetime
+import subprocess
 
-from twilio.rest import Client
-
+# PyQt5
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
 from PyQt5.QtPrintSupport import *
-from PyQt5.QtMultimedia  import *
-from PyQt5.QtWebEngineWidgets import *
 
-import os
-import sys
-import time
-
+# CSS
 from PyStyle import StyleSheet
 
+# Firebase
 import FireRead
 import FireWrite
 
 # Twilio
+from twilio.rest import Client
 TWILIO_NUMBER = os.environ['TWILIO_NUMBER']
 TWILIO_RECVR  = os.environ['TWILIO_RECVR']
 ACCOUNT_SID   = os.environ['TWILIO_ACCOUNT_SID']
@@ -31,8 +31,6 @@ class MainWindow(QMainWindow):
   
   def __init__(self, *args, **kwargs):
     super(MainWindow, self).__init__(*args, **kwargs)
-
-    self.appctxt = ApplicationContext()
 
     # remove Minimize, Maximize, and Close buttons from application window
     self.setWindowFlags(self.windowFlags() | Qt.CustomizeWindowHint)
@@ -47,8 +45,8 @@ class MainWindow(QMainWindow):
 
     # Main Widget Container
     MainWidgetContainer = QWidget()
-    QFontDatabase.addApplicationFont(self.appctxt.get_resource('fonts/Montserrat-Bold.ttf'))
-    QFontDatabase.addApplicationFont(self.appctxt.get_resource('fonts/Montserrat-Regular.ttf'))
+    QFontDatabase.addApplicationFont('src/main/resources/base/fonts/Montserrat-Bold.ttf')
+    QFontDatabase.addApplicationFont('src/main/resources/base/fonts/Montserrat-Regular.ttf')
     MainWidgetContainer.setStyleSheet(StyleSheet.css("window"))
     self.setCentralWidget(MainWidgetContainer)
 
@@ -68,24 +66,53 @@ class MainWindow(QMainWindow):
     # clock #
     self.clock = QLabel( time.strftime("%H"+":"+"%M") )
     self.clock.setAlignment(Qt.AlignRight)
-    self.clock.setFixedHeight(50*em)
+    self.clock.setFixedWidth(300*em)
     self.clock.setStyleSheet( StyleSheet.css("clock") )
+    self.clockSpacer = QLabel() # spacer
+    self.clockSpacer.setStyleSheet( StyleSheet.css("spacer") )
+    self.clockSpacer.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Minimum)
 
-     # S&T Connect Browser #
-    self.webBtn = QPushButton("Schedule Appointment")
-    self.webBtn.setFixedHeight(50*em)
-    self.webBtn.setStyleSheet( StyleSheet.css("webBtn") )
+    # date
+    self.date = QLabel( datetime.datetime.now().strftime("%A, "+"%b. "+"%d") )
+    self.date.setAlignment(Qt.AlignRight)
+    self.date.setFixedWidth(300*em)
+    self.date.setStyleSheet( StyleSheet.css("date") )
+
+    # S&T Connect Browser #
+    # self.webBtn = QPushButton("Schedule Appointment")
+    # self.webBtn.setFixedHeight(50*em)
+    # self.webBtn.setStyleSheet( StyleSheet.css("webBtn") )
+
+    # QR Code #
+    self.qr = QLabel(self)
+    self.qr.setFixedSize(100*em,100*em)
+    self.qr.move(715,10)
+    self.qr.setStyleSheet(StyleSheet.css("qrCode"))
+    pixmap = QPixmap('src/main/resources/base/images/qrcode-transparent.png')
+    image = pixmap.scaled(100*em, 100*em, Qt.KeepAspectRatio, Qt.FastTransformation)
+    self.qr.setPixmap(image)
+    #labels
+    self.qrTLabel = QLabel("SCAN ME", self)
+    self.qrBLabel = QLabel("Schedule Appointment", self)
+    self.qrBLabel.setFixedWidth(200*em)
+    self.qrTLabel.move(715,-6)
+    self.qrBLabel.move(665,96)
+    self.qrTLabel.setAlignment(Qt.AlignCenter)
+    self.qrBLabel.setAlignment(Qt.AlignCenter)
+    self.qrTLabel.setStyleSheet(StyleSheet.css("qrLabel"))
+    self.qrBLabel.setStyleSheet(StyleSheet.css("qrLabel"))
 
     # Office Hours #
     self.hours = QLabel("12:00 - 12:00")
-    self.hoursLabel = QLabel("Office Hours")
-    self.hours.setFixedWidth(self.clock.width())
-    self.hoursLabel.setFixedWidth(self.clock.width())
     self.hours.setStyleSheet(StyleSheet.css("hours"))
+    self.hours.setFixedWidth(self.clock.width())
+    #label
+    self.hoursLabel = QLabel("Office Hours")
+    self.hoursLabel.setFixedWidth(self.hours.width())
     self.hoursLabel.setStyleSheet( StyleSheet.css("hoursLabel") )
     self.hoursSpacer = QLabel() # spacer
     self.hoursSpacer.setStyleSheet( StyleSheet.css("spacer") )
-    self.hoursSpacer.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Minimum)    
+    self.hoursSpacer.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Minimum) 
 
     # Available / Unavailable #
     self.available = QLabel("UNAVAILABLE")
@@ -95,15 +122,22 @@ class MainWindow(QMainWindow):
 
     # Display Message #
     self.displayMsg = QTextEdit()
-    self.displayMsg.setFixedSize(800*em, 90*em)
+    self.displayMsg.setFixedSize(800*em, 100*em)
     self.displayMsg.setText("No messages")
     self.displayMsg.setReadOnly(True)
     self.displayMsg.setAlignment(Qt.AlignCenter)
     self.displayMsg.setStyleSheet( StyleSheet.css("displayMsg") )
+    # last modified label
+    self.displayMsgUpdate = QLabel(self)
+    self.displayMsgUpdate.setFixedWidth(200*em)
+    self.displayMsgUpdate.move(160,120)
+    self.displayMsgUpdate.setStyleSheet(StyleSheet.css("displayMsgUpdate"))
 
      # S&T Logo #
-    self.logoLabel = QLabel()
-    pixmap = QPixmap( self.appctxt.get_resource('images/MissouriS&T_Horizontal_DigitalMinerGreen.png') )
+    self.logoLabel = QLabel(self)
+    self.logoLabel.move(335, 240)
+    self.logoLabel.setFixedSize(400*em, 100*em)
+    pixmap = QPixmap('src/main/resources/base/images/MissouriS&T_Horizontal_DigitalMinerGreen.png')
     image = pixmap.scaled(400*em, 60*em, Qt.KeepAspectRatio, Qt.FastTransformation)
     self.logoLabel.setPixmap(image)
 
@@ -129,7 +163,7 @@ class MainWindow(QMainWindow):
         btn.setFixedWidth(100*em)
 
     # Student Name #
-    self.studentName = QLineEdit()
+    self.studentName = LineEdit()
     self.studentNameLabel = QLabel("Name")
     self.studentNameLabel.setAlignment(Qt.AlignRight)
     self.studentName.setFixedSize(241*em, 40*em)
@@ -167,10 +201,19 @@ class MainWindow(QMainWindow):
     # main vertical container layout
     MainVLayout = QVBoxLayout(MainWidgetContainer)
 
+
+    # TOP BAR
+    #__________________________________________________________________________
+
     # office hours
     HoursVLayout = QVBoxLayout()
     HoursVLayout.addWidget(self.hours)
     HoursVLayout.addWidget(self.hoursLabel)
+
+    # clock / date
+    ClockVLayout = QVBoxLayout()
+    ClockVLayout.addWidget(self.clock)
+    ClockVLayout.addWidget(self.date)
 
     # top info bar
     TopHLayout = QHBoxLayout()
@@ -178,23 +221,22 @@ class MainWindow(QMainWindow):
     TopHLayout.addLayout(HoursVLayout)
     TopHLayout.addWidget(self.hoursSpacer)
     TopHLayout.addWidget(self.available)
-    TopHLayout.addWidget(self.webBtn)
-    TopHLayout.addWidget(self.clock)
+    # TopHLayout.addWidget(self.webBtn)
+    TopHLayout.addWidget(self.clockSpacer)
+    TopHLayout.addLayout(ClockVLayout)
+
+    #__________________________________________________________________________
 
     # display message
     DisplayMsgHLayout = QHBoxLayout()
     DisplayMsgHLayout.setAlignment(Qt.AlignCenter)
     DisplayMsgHLayout.addWidget(self.displayMsg)
 
-    # S&T logo
-    LogoHLayout = QHBoxLayout()
-    LogoHLayout.setAlignment(Qt.AlignCenter)
-    LogoHLayout.addWidget(self.logoLabel)
-
     # clear history
     ClearConvoHLayout = QHBoxLayout()
     ClearConvoHLayout.setAlignment(Qt.AlignRight)
     ClearConvoHLayout.addWidget(self.convoClear)
+
 
     # STUDENT MESSAGING
     #__________________________________________________________________________
@@ -204,8 +246,8 @@ class MainWindow(QMainWindow):
     MsgCenterHLayout = QHBoxLayout()
 
     # Group Box
-    self.msgGroupBox = QGroupBox("Student Messaging")
-    self.msgGroupBox.setAlignment(Qt.AlignCenter)
+    self.msgGroupBox = QGroupBox("Message Center")
+    self.msgGroupBox.setAlignment(Qt.AlignLeft)
     self.msgGroupBox.setStyleSheet( StyleSheet.css("msgGroupBox") )
     self.msgGroupBox.setLayout(MsgCenterVLayout)
 
@@ -239,7 +281,6 @@ class MainWindow(QMainWindow):
     # add layouts and widgets
     MainVLayout.addLayout(TopHLayout)
     MainVLayout.addLayout(DisplayMsgHLayout)
-    MainVLayout.addLayout(LogoHLayout)
     MainVLayout.addLayout(ClearConvoHLayout)
     MainVLayout.addLayout(MsgCenterHLayout)
 
@@ -247,8 +288,10 @@ class MainWindow(QMainWindow):
     #  SIGNAL / SLOTS  #
     ####################
     self.resized.connect(self.SLOT_resized)
-    self.webBtn.clicked.connect(self.SLOT_webBtnClicked)
+    # self.webBtn.clicked.connect(self.SLOT_webBtnClicked)
     self.convoClear.clicked.connect(self.SLOT_convoClearClicked)
+    self.studentName.focusIn.connect(self.SLOT_nameFocusIn)
+    self.studentName.focusOut.connect(self.SLOT_nameFocusOut)
     self.sendMsgBtn.clicked.connect(self.SLOT_sendMsgBtnClicked)
     self.displayMsg.textChanged.connect(self.SLOT_displayMsgChanged)
     for btn in self.studentMsgSel:
@@ -277,16 +320,16 @@ class MainWindow(QMainWindow):
     self.readFirebase()
 
     # refresh data timer
-    # repeats infinitely to trigger data retrieval from Firebase
-    refreshTimer = QTimer(self)
-    refreshTimer.timeout.connect(self.readFirebase)
-    refreshTimer.start(2500)
+    # restarts every time FireRead thread finishes
+    self.refreshTimer = QTimer(self)
+    self.refreshTimer.setSingleShot(True)
+    self.refreshTimer.timeout.connect(self.readFirebase)
 
     # clock timer
-    # repeats infinitely to trigger clock updates every 10 seconds
+    # repeats infinitely to trigger clock updates every 5 seconds
     clockTimer = QTimer(self)
     clockTimer.timeout.connect(self.updateClock)
-    clockTimer.start(10000)
+    clockTimer.start(5000)
 
   # spawn FireRead thread to read data values for all tags stored in Firebase
   # called cyclically by refreshTimer
@@ -350,15 +393,25 @@ class MainWindow(QMainWindow):
 
     self.hours.setText( startTime + " - " + endTime )
 
-  # SLOT: schedule appointment button clicked - open browser to S&T Connect
-  def SLOT_webBtnClicked(self):
-    self.web = QWebEngineView()
-    self.web.page().profile().cookieStore().deleteAllCookies()
-    self.web.setUrl( QUrl("https://mst.starfishsolutions.com/starfish-ops/instructor/serviceCatalog.html?tenantId=594#/") )
-    self.web.setFixedSize(1024*em, 600*em)
-    self.web.setWindowFlag(Qt.WindowMaximizeButtonHint, False)
-    self.web.setWindowFlag(Qt.WindowMinimizeButtonHint, False)
-    self.web.show()
+  # PyQtWebEngine currently not supported on pi
+  # # SLOT: schedule appointment button clicked - open browser to S&T Connect
+  # def SLOT_webBtnClicked(self):
+    # self.web = QWebEngineView()
+    # self.web.page().profile().cookieStore().deleteAllCookies()
+    # self.web.setUrl( QUrl("https://mst.starfishsolutions.com/starfish-ops/instructor/serviceCatalog.html?tenantId=594#/") )
+    # self.web.setFixedSize(1024*em, 600*em)
+    # self.web.setWindowFlag(Qt.WindowMaximizeButtonHint, False)
+    # self.web.setWindowFlag(Qt.WindowMinimizeButtonHint, False)
+    # self.web.show()
+
+  # SLOT: student name line edit focused - open keyboard
+  def SLOT_nameFocusIn(self):
+    self.keyboard = subprocess.Popen('matchbox-keyboard', stdout=subprocess.PIPE)
+    self.studentName.setFocus()
+
+  # SLOT: student name line edit lost focus - close keyboard
+  def SLOT_nameFocusOut(self):
+    self.keyboard.kill()
 
   # SLOT: send student message button clicked
   def SLOT_sendMsgBtnClicked(self):
@@ -389,6 +442,7 @@ class MainWindow(QMainWindow):
 
   # SLOT: teacher reply received
   def SLOT_teacherReply(self, reply):
+    self.sendSMS( self.windowTitle() + ": " + reply )
     self.convoText.append( StyleSheet.msgHTML + 
                            StyleSheet.timestampHTML + self.clock.text() + "\t" + "</span>" +
                            StyleSheet.teacherNameHTML + self.windowTitle() + ":"  + "</span> " +
@@ -397,6 +451,7 @@ class MainWindow(QMainWindow):
   # SLOT: clear chat button clicked
   def SLOT_convoClearClicked(self):
    msgBox = QMessageBox()
+   msgBox.setWindowTitle("V.O.S.")
    msgBox.setText('Are sure you want to clear your chat history?')
    msgBox.addButton(QPushButton('Yes'), QMessageBox.YesRole)
    msgBox.addButton(QPushButton('No'), QMessageBox.NoRole)
@@ -408,10 +463,12 @@ class MainWindow(QMainWindow):
   # SLOT: firebase data retrieval thread finished
   def SLOT_threadFinished(self, newData):
     self.data = newData
+    self.refreshTimer.start(2500)
 
   # SLOT: Display Message changed - reset text alignment
   def SLOT_displayMsgChanged(self):
     try:
+      self.displayMsgUpdate.setText("updated " + datetime.datetime.now().strftime("%b. "+"%d at "+ self.clock.text() ) )
       self.displayMsg.setAlignment(Qt.AlignCenter)
     except:
       pass
@@ -449,6 +506,11 @@ class MainWindow(QMainWindow):
       am_pm = "pm"
     
     self.clock.setText( currentTime[0] + ":" + currentTime[1] + am_pm )
+    self.updateDate()
+
+  # update date display
+  def updateDate(self):
+    self.date.setText( datetime.datetime.now().strftime("%A, "+"%b. "+"%d") )
 
   # map key press events to gallery navigation
   def keyPressEvent(self, event):
@@ -490,8 +552,16 @@ class MainWindow(QMainWindow):
     self.resized.emit()
     return super(MainWindow, self).resizeEvent(event)
 
+# overide QLineEdit Focus Events to emit signals
+class LineEdit(QLineEdit):
+  focusIn = pyqtSignal()
+  focusOut = pyqtSignal()
+  def focusInEvent(self, event):
+    self.focusIn.emit()
+  def focusOutEvent(self, event):
+    self.focusOut.emit()
+
 if __name__ == '__main__':
-    appctxt = ApplicationContext()       # 1. Instantiate ApplicationContext
+    app = QApplication(sys.argv)
     Window = MainWindow()
-    exit_code = appctxt.app.exec_()      # 2. Invoke appctxt.app.exec_()
-    sys.exit(exit_code)
+    sys.exit(app.exec_())
